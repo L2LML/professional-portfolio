@@ -59,39 +59,38 @@ with left:
                        xaxis=dict(showgrid=False), yaxis=dict(showgrid=False))
     st.plotly_chart(fig1, use_container_width=True)
 
-# ── Net Margin by Product ─────────────────────────────────────
+# ── Loss Ratio by Product ─────────────────────────────────────
 with right:
-    st.subheader("Net Margin by Product")
+    st.subheader("Loss Ratio by Product")
     st.caption(
-        "**Net Margin** = Annual Premiums Collected minus Claims Paid. "
-        "🟢 Green = the product generates more in premiums than it pays in claims. "
-        "🔴 Red = claims are exceeding premiums collected — the product is losing money."
+        "**Loss Ratio** = Claims Paid ÷ Premiums Collected. "
+        "🟢 Below 0.70 = healthy. 🟡 0.70–0.85 = watch zone. 🔴 Above 0.85 = high risk. "
+        "Dashed line = industry benchmark. Each product tells a different story."
     )
-    rev = pol.groupby("policy_type")["total_collected"].sum().reset_index()
-    exp = df[df["claim_status"]=="paid"].groupby("policy_type")["claim_amount"].sum().reset_index()
-    combined = rev.merge(exp, on="policy_type", how="outer").fillna(0)
-    combined.columns = ["Policy Type","Premiums","Claims Paid"]
-    combined["Net Margin"] = combined["Premiums"] - combined["Claims Paid"]
-    combined = combined.sort_values("Net Margin", ascending=True)
-    combined["color"] = combined["Net Margin"].apply(
-        lambda v: GREEN if v >= 0 else RED
+    rev2  = pol.groupby("policy_type")["total_collected"].sum()
+    exp2  = df[df["claim_status"]=="paid"].groupby("policy_type")["claim_amount"].sum()
+    lr_rt = (exp2 / rev2).dropna().reset_index()
+    lr_rt.columns = ["Policy Type","Loss Ratio"]
+    lr_rt = lr_rt.sort_values("Loss Ratio", ascending=True)
+    lr_rt["color"] = lr_rt["Loss Ratio"].apply(
+        lambda r: GREEN if r < 0.70 else (AMBER if r < 0.85 else RED)
     )
 
     fig2 = go.Figure(go.Bar(
-        x=combined["Net Margin"] / 1000,
-        y=combined["Policy Type"],
+        x=lr_rt["Loss Ratio"],
+        y=lr_rt["Policy Type"],
         orientation="h",
-        marker_color=combined["color"].tolist(),
-        text=[f"${v/1000:+,.0f}K" for v in combined["Net Margin"]],
+        marker_color=lr_rt["color"].tolist(),
+        text=[f"{v:.2f}" for v in lr_rt["Loss Ratio"]],
         textposition="outside",
     ))
-    fig2.add_vline(x=0, line_color="black", line_width=1)
+    fig2.add_vline(x=0.70, line_dash="dash", line_color=AMBER, line_width=2,
+                  annotation_text="Benchmark 0.70", annotation_font_color=AMBER)
     fig2.update_layout(
         height=300,
-        xaxis_title="Net Margin ($K)",
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(showgrid=False),
+        xaxis=dict(title="Loss Ratio", range=[0, 1.2], showgrid=False),
         yaxis=dict(showgrid=False),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
     )
     st.plotly_chart(fig2, use_container_width=True)
 

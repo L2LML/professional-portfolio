@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.load_data import load_claims_fact, load_policies, load_policyholders
+import numpy as np
 from data.colors import NAVY, BLUE, GREEN, RED, AMBER, GRID, RISK_SCALE
 
 st.set_page_config(page_title="Customer Segments", page_icon="👥", layout="wide")
@@ -104,10 +105,12 @@ paid_matrix = (
     .groupby(["age_band","tenure_tier"])["claim_amount"].sum()
     .reset_index().rename(columns={"claim_amount":"claims_paid"})
 )
+# Use total premiums collected (annual × years in force) so loss ratio is apples-to-apples
+pol_seg = pol[pol["age_band"].notna() & pol["tenure_tier"].notna()].copy()
+pol_seg["total_collected"] = pol_seg["annual_premium"] * pol_seg["years_in_force"].clip(lower=1)
 pol_matrix = (
-    pol[pol["age_band"].notna() & pol["tenure_tier"].notna()]
-    .groupby(["age_band","tenure_tier"])["annual_premium"].sum()
-    .reset_index().rename(columns={"annual_premium":"premiums"})
+    pol_seg.groupby(["age_band","tenure_tier"])["total_collected"].sum()
+    .reset_index().rename(columns={"total_collected":"premiums"})
 )
 matrix = pol_matrix.merge(paid_matrix, on=["age_band","tenure_tier"], how="left").fillna(0)
 matrix["loss_ratio"] = (

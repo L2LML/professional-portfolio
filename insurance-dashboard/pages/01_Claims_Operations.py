@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.load_data import load_claims_fact
-from data.colors import AGING_COLORS, BLUE, SKY, NAVY, GRID, TEXT_MID, STATUS_COLORS, AMBER
+from data.colors import AGING_COLORS, BLUE, SKY, NAVY, GRID, TEXT_MID, STATUS_COLORS, AMBER, RED, GREEN
 
 st.set_page_config(page_title="Claims Operations", page_icon="📋", layout="wide")
 st.title("📋 Claims Operations")
@@ -151,6 +151,7 @@ fig3.update_layout(
     legend=dict(orientation="h", y=1.12),
     barmode="overlay",
 )
+st.plotly_chart(fig3, use_container_width=True)
 
 # ── Open claims detail table ──────────────────────────────────
 st.subheader("Open Claims Detail")

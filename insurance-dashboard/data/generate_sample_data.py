@@ -139,7 +139,22 @@ statuses = random.choices(
     weights=[25, 12, 20, 18, 10], k=n_c
 )
 
-filed_dates = [rand_date(date(2018, 1, 1), date(2024, 11, 1)) for _ in range(n_c)]
+def rand_filed_date(status):
+    """Give open/pending claims recent dates so SLA buckets have real variety."""
+    today = date.today()
+    if status in ("pending", "under_review"):
+        # Mix of on-track (< 30d), at-risk (30-44d), breached (45+d)
+        days_ago = random.choices(
+            [random.randint(1, 29),   # on track
+             random.randint(30, 44),  # at risk
+             random.randint(45, 90)], # breached
+            weights=[40, 30, 30]
+        )[0]
+        return today - timedelta(days=days_ago)
+    else:
+        return rand_date(date(2018, 1, 1), date(2024, 6, 1))
+
+filed_dates = [rand_filed_date(statuses[i]) for i in range(n_c)]
 death_dates = [fd - timedelta(days=random.randint(3, 45)) for fd in filed_dates]
 causes = random.choices(CAUSES, weights=CAUSE_WEIGHTS, k=n_c)
 

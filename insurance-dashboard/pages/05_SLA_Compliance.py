@@ -83,33 +83,46 @@ st.divider()
 left, right = st.columns(2)
 
 with left:
-    st.subheader("Open Claims SLA Status")
+    st.subheader("What Kind of Claims Are Open?")
     st.caption(
-        "Every open claim is classified by its urgency. "
-        "**Breached** claims must be escalated immediately — every day past 45 increases regulatory risk."
+        "Open claims broken down by **policy type** — so you can see whether overdue claims "
+        "are concentrated in Term Life, Whole Life, or other products. "
+        "Colors match the product legend used throughout the dashboard."
     )
     if not open_claims.empty:
-        open_claims["sla_status"] = open_claims.apply(
-            lambda r: "🔴 Breached (45+ days)"  if r["breached"]
-            else ("🟡 At Risk (30–44 days)"      if r["at_risk"]
-            else "🟢 On Track (< 30 days)"),
-            axis=1
+        from data.colors import PRODUCT_COLORS
+        # Classify each open claim by urgency
+        open_claims["sla_bucket"] = open_claims["days_open"].apply(
+            lambda d: "🔴 Breached (45+ days)" if d >= 45
+            else ("🟡 At Risk (30–44 days)" if d >= 30
+            else "🟢 On Track (< 30 days)")
         )
-        sla_dist = open_claims["sla_status"].value_counts().reset_index()
-        sla_dist.columns = ["Status","Count"]
-        color_map = {
-            "🔴 Breached (45+ days)":  RED,
-            "🟡 At Risk (30–44 days)": AMBER,
-            "🟢 On Track (< 30 days)": GREEN,
-        }
-        fig1 = px.bar(sla_dist, x="Status", y="Count",
-                      color="Status", color_discrete_map=color_map,
-                      text="Count")
-        fig1.update_traces(textposition="outside")
+        BUCKET_ORDER = ["🟢 On Track (< 30 days)","🟡 At Risk (30–44 days)","🔴 Breached (45+ days)"]
+        by_type = (
+            open_claims.groupby(["sla_bucket","policy_type"])
+            .size().reset_index(name="count")
+        )
+        import pandas as pd_inner
+        by_type["sla_bucket"] = pd_inner.Categorical(
+            by_type["sla_bucket"], categories=BUCKET_ORDER, ordered=True
+        )
+        by_type = by_type.sort_values("sla_bucket")
+
+        fig1 = px.bar(
+            by_type, x="sla_bucket", y="count",
+            color="policy_type",
+            color_discrete_map=PRODUCT_COLORS,
+            barmode="stack",
+            labels={"sla_bucket":"SLA Status","count":"Open Claims","policy_type":"Product"},
+            text="count",
+        )
+        fig1.update_traces(textposition="inside", textfont_color="white")
         fig1.update_layout(
-            showlegend=False, height=300,
+            height=320,
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            xaxis=dict(showgrid=False), yaxis=dict(gridcolor=GRID),
+            xaxis=dict(showgrid=False),
+            yaxis=dict(gridcolor=GRID),
+            legend=dict(orientation="h", y=1.15, title=""),
         )
         st.plotly_chart(fig1, use_container_width=True)
 
