@@ -115,14 +115,79 @@ A Claude AI skill for scanning, organizing, and logging property tax assessment 
 
 ## 🛠 Skills Summary
 
+### Languages
+| Language | Proficiency | Used In |
+|----------|-------------|---------|
+| **Python** | Intermediate | Cloud migration pipeline, PDF builder, AI automation |
+| **SQL** | Advanced | Life insurance claims DB — 24 queries, triggers, stored procedures |
+| **Java** | Intermediate | Virtual Stock Market capstone, vending machine CLI |
+| **C#** | Intermediate | Guess the Number — TDD with xUnit |
+| **JavaScript / Vue.js** | Intermediate | Virtual Stock Market frontend |
+
+---
+
+### Python Libraries
+| Library | Purpose | Project |
+|---------|---------|---------|
+| `pandas` | DataFrame transformation, enrichment, binning | Cloud migration pipeline |
+| `numpy` | Vectorized operations, computed fields | Cloud migration pipeline |
+| `sqlalchemy` | Database connection, ORM, query execution | Cloud migration pipeline |
+| `psycopg2` | PostgreSQL driver | Cloud migration pipeline |
+| `pyarrow` | Parquet read/write, Snappy compression | Cloud migration pipeline |
+| `boto3` | AWS S3 upload, cloud data lake delivery | Cloud migration pipeline |
+| `matplotlib` | Business charts, audit visualizations | Cloud migration pipeline |
+| `seaborn` | Statistical visualization styling | Cloud migration pipeline |
+| `reportlab` | PDF generation and layout | Legal Exhibit PDF Builder |
+| `Pillow` | Image processing, format conversion | Legal Exhibit PDF Builder |
+| `pillow-heif` | iPhone HEIC/HEIF photo support | Legal Exhibit PDF Builder |
+| `opencv-python` | Image preprocessing | Legal Exhibit PDF Builder |
+| `python-dotenv` | Secure credential management via `.env` | Cloud migration pipeline |
+
+---
+
+### Database & SQL
+| Skill | Detail |
+|-------|--------|
+| **PostgreSQL** | Schema design, indexes, check constraints, comments |
+| **Advanced SQL** | INNER / LEFT / FULL OUTER JOIN · UNION · EXCEPT |
+| **Window Functions** | `SUM() OVER`, `RANK()`, `DENSE_RANK()`, `ROW_NUMBER()`, `LAG()`, `PARTITION BY` |
+| **CTEs** | Single-step, multi-step chained, CTE with window functions |
+| **Triggers** | BEFORE/AFTER · INSERT/UPDATE · audit trail · validation |
+| **Stored Procedures** | PL/pgSQL · exception handling · status transition logic |
+| **Views** | Reusable reporting views for operations and analytics |
+
+---
+
+### Data Engineering & Cloud
+| Skill | Detail |
+|-------|--------|
+| **ETL Pipeline Design** | Extract → Transform → Validate → Visualize → Load |
+| **Parquet / pyarrow** | Columnar storage, Snappy compression, schema-aware writes |
+| **AWS S3** | `boto3` upload, versioned partitioned data lake key design |
+| **Data Quality Validation** | Null checks, referential integrity, business rule enforcement, JSON reports |
+| **Cloud Patterns** | Google BigQuery (`pandas-gbq`), Snowflake (`snowflake-connector`) reference implementations |
+| **Data Lake Architecture** | Raw → Transformed → Analytical layering |
+
+---
+
+### Other Technical Skills
 | Category | Skills |
 |----------|--------|
-| **Process Improvement** | Lean Six Sigma (DMAIC), FMEA, C&E Matrix, 5S, VSM, SWI, Gage R&R |
-| **Statistical Analysis** | Minitab, T-Test, Hypothesis Testing, Confidence Intervals |
-| **Project Management** | Charter, Stakeholder Management, Milestone Planning, Change Management |
-| **Full-Stack Development** | Java, Spring Boot, Vue.js, PostgreSQL, REST APIs, C#, .NET |
-| **Testing** | TDD, xUnit, Unit Testing (96% coverage) |
-| **AI & Automation** | Claude AI, Prompt Engineering, Document Processing |
+| **Full-Stack Development** | Java · Spring Boot · Vue.js · PostgreSQL · REST APIs · C# · .NET |
+| **Testing** | TDD · xUnit · Unit Testing (96% coverage) |
+| **AI & Automation** | Claude AI · Prompt Engineering · Document Processing |
+| **Version Control** | Git · GitHub |
+
+---
+
+### Business & Domain Skills
+| Category | Skills |
+|----------|--------|
+| **Lean Six Sigma** | DMAIC · FMEA · C&E Matrix · 5S · VSM · SWI · Gage R&R · LSSBB Certified |
+| **Statistical Analysis** | Minitab · Two-Sample T-Test · Hypothesis Testing · Confidence Intervals |
+| **Project Management** | Charter · Stakeholder Management · Milestone Planning · Change Management |
+| **Insurance Domain** | Policy types · Claims adjudication · Beneficiary management · Contestability · Audit compliance |
+| **Process Improvement** | NVA analysis · Swim lane mapping · Waste elimination · Root cause analysis |
 
 ---
 
