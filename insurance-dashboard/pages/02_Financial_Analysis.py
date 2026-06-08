@@ -27,7 +27,10 @@ _sidebar_note()
 df  = load_claims_fact()
 pol = load_policies()
 
-paid = df[df["claim_status"] == "paid"]
+# Compute lifetime premiums once — used throughout this page
+pol["total_collected"] = pol["annual_premium"] * pol["years_in_force"].clip(lower=1)
+
+paid     = df[df["claim_status"] == "paid"]
 approved = df[df["claim_status"].isin(["paid","approved"])]
 
 # ── KPIs ──────────────────────────────────────────────────────
@@ -35,7 +38,6 @@ c1, c2, c3, c4 = st.columns(4)
 c1.metric("Total Paid",       f"${paid['claim_amount'].sum()/1e6:.2f}M")
 c2.metric("Avg Claim (Paid)", f"${paid['claim_amount'].mean():,.0f}")
 c3.metric("Largest Claim",    f"${df['claim_amount'].max():,.0f}")
-pol["total_collected"] = pol["annual_premium"] * pol["years_in_force"].clip(lower=1)
 overall_lr = paid["claim_amount"].sum() / max(pol["total_collected"].sum(), 1)
 lr_zone = "🟢 Healthy" if overall_lr < 0.70 else ("🟡 Watch" if overall_lr < 0.85 else "🔴 High Risk")
 c4.metric("Portfolio Loss Ratio", f"{overall_lr:.2f}",
@@ -146,75 +148,45 @@ with col2:
     if not by_reason.empty:
         st.dataframe(by_reason, use_container_width=True, hide_index=True)
 
-# ── Loss Ratio by Product ─────────────────────────────────────
+# ── Unit Economics by Product ─────────────────────────────────
 st.divider()
-st.subheader("📊 Loss Ratio by Product Line")
-st.info(
-    "**Loss Ratio** = Total Claims Paid ÷ Total Premiums Collected for that product. \n\n"
-    "- **Below 0.70** 🟢 — Healthy. The company keeps 30+ cents of every premium dollar after paying claims.\n"
-    "- **0.70 – 0.85** 🟡 — Watch zone. Still profitable but claims are eating into margins.\n"
-    "- **Above 0.85** 🔴 — High risk. Little margin left for operating costs. Above 1.0 means paying out more than collecting.\n\n"
-    "Industry benchmark for life insurance: **0.55 – 0.75**"
+st.subheader("📊 Unit Economics by Product Line")
+st.caption(
+    "**Avg Annual Premium** = what a typical policy of this type earns per year. "
+    "**Avg Claim When Filed** = what the company typically pays out when a claim is made. "
+    "The gap between them shows the revenue relationship per policy type."
 )
+unit = pol.groupby("policy_type").agg(
+    avg_premium=("annual_premium","mean"),
+    policy_count=("policy_id","count"),
+).reset_index()
+claim_unit = df[df["claim_status"]=="paid"].groupby("policy_type")["claim_amount"].mean().reset_index()
+claim_unit.columns = ["policy_type","avg_claim"]
+unit = unit.merge(claim_unit, on="policy_type", how="left").fillna(0)
 
-paid_by_type = (
-    df[df["claim_status"] == "paid"]
-    .groupby("policy_type")["claim_amount"].sum()
-    .reset_index().rename(columns={"claim_amount":"paid"})
-)
-# Total premiums collected = annual premium × years in force per policy
-pol["total_collected"] = pol["annual_premium"] * pol["years_in_force"].clip(lower=1)
-prem_by_type = (
-    pol.groupby("policy_type")["total_collected"].sum()
-    .reset_index().rename(columns={"total_collected":"premiums"})
-)
-lr_df = prem_by_type.merge(paid_by_type, on="policy_type", how="left").fillna(0)
-lr_df["loss_ratio"] = (lr_df["paid"] / lr_df["premiums"].replace(0, float("nan"))).round(3)
-lr_df = lr_df.dropna(subset=["loss_ratio"]).sort_values("loss_ratio", ascending=True)
-
-# Color each bar by its loss ratio zone
-lr_df["color"] = lr_df["loss_ratio"].apply(
-    lambda r: GREEN if r < 0.70 else (AMBER if r < 0.85 else RED)
-)
-lr_df["zone"] = lr_df["loss_ratio"].apply(
-    lambda r: "Healthy (< 0.70)" if r < 0.70 else ("Watch (0.70–0.85)" if r < 0.85 else "High Risk (> 0.85)")
-)
-
-fig_lr = go.Figure()
-for _, row in lr_df.iterrows():
-    fig_lr.add_trace(go.Bar(
-        x=[row["loss_ratio"]],
-        y=[row["policy_type"]],
-        orientation="h",
-        marker_color=row["color"],
-        name=row["zone"],
-        text=[f"{row['loss_ratio']:.2f}"],
-        textposition="outside",
-        showlegend=False,
-    ))
-
-# Industry benchmark line at 0.70
-fig_lr.add_vline(
-    x=0.70, line_dash="dash", line_color=AMBER, line_width=2,
-    annotation_text="Benchmark 0.70", annotation_position="top right",
-    annotation_font_color=AMBER,
-)
-# Break-even line at 1.0
-fig_lr.add_vline(
-    x=1.0, line_dash="dot", line_color=RED, line_width=2,
-    annotation_text="Break-even 1.0", annotation_position="top right",
-    annotation_font_color=RED,
-)
-fig_lr.update_layout(
-    height=320, xaxis_title="Loss Ratio",
-    xaxis=dict(range=[0, max(lr_df["loss_ratio"].max() * 1.3, 1.1)], showgrid=False),
-    yaxis=dict(showgrid=False),
+fig_unit = go.Figure()
+fig_unit.add_trace(go.Bar(
+    name="Avg Annual Premium",
+    x=unit["policy_type"],
+    y=unit["avg_premium"],
+    marker_color=GREEN,
+    text=[f"${v:,.0f}" for v in unit["avg_premium"]],
+    textposition="outside",
+))
+fig_unit.add_trace(go.Bar(
+    name="Avg Claim When Filed",
+    x=unit["policy_type"],
+    y=unit["avg_claim"],
+    marker_color=RED,
+    opacity=0.8,
+    text=[f"${v:,.0f}" for v in unit["avg_claim"]],
+    textposition="outside",
+))
+fig_unit.update_layout(
+    barmode="group", height=340,
     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    margin=dict(t=20, b=20, l=10, r=80),
+    xaxis=dict(showgrid=False),
+    yaxis=dict(gridcolor=GRID, title="Amount ($)"),
+    legend=dict(orientation="h", y=1.12),
 )
-st.plotly_chart(fig_lr, use_container_width=True)
-
-# Summary callout
-overall_lr = df[df["claim_status"]=="paid"]["claim_amount"].sum() / max(pol["total_collected"].sum(), 1)
-zone_label = "🟢 Healthy" if overall_lr < 0.70 else ("🟡 Watch Zone" if overall_lr < 0.85 else "🔴 High Risk")
-st.metric("Overall Portfolio Loss Ratio", f"{overall_lr:.2f}", zone_label, delta_color="off")
+st.plotly_chart(fig_unit, use_container_width=True)

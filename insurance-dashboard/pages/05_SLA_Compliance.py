@@ -147,28 +147,45 @@ with right:
         bin_counts = decided["bin"].value_counts().reindex(labels, fill_value=0).reset_index()
         bin_counts.columns = ["Bin","Count"]
 
+        total_decided = bin_counts["Count"].sum()
+        bin_counts["pct"] = (bin_counts["Count"] / max(total_decided,1) * 100).round(1)
+        bin_counts["label"] = bin_counts.apply(
+            lambda r: f"{r['Count']} claims<br>{r['pct']:.0f}%" if r["Count"] > 0 else "", axis=1
+        )
+
         fig2 = go.Figure(go.Bar(
             x=bin_counts["Bin"],
             y=bin_counts["Count"],
             marker_color=colors,
-            text=bin_counts["Count"],
+            text=bin_counts["label"],
             textposition="outside",
         ))
         fig2.add_vline(
-            x=3.5,              # between "31–45d" and "46–60d" buckets
+            x=3.5,
             line_dash="dash", line_color=RED, line_width=2,
-            annotation_text="45-day SLA limit",
+            annotation_text="← Within SLA  |  SLA Breached →",
             annotation_font_color=RED,
-            annotation_position="top right",
+            annotation_position="top center",
         )
         fig2.update_layout(
-            height=300,
+            height=340,
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
             xaxis=dict(showgrid=False, title="Days to Decision"),
             yaxis=dict(gridcolor=GRID, title="# Claims"),
             showlegend=False,
+            uniformtext_minsize=8,
+            uniformtext_mode="hide",
         )
         st.plotly_chart(fig2, use_container_width=True)
+
+        # Zone summary below chart
+        within_sla = bin_counts[bin_counts["Bin"].isin(["0–10d","11–20d","21–30d","31–45d"])]["Count"].sum()
+        breached    = bin_counts[bin_counts["Bin"].isin(["46–60d","61–90d","90+d"])]["Count"].sum()
+        sla_pct = within_sla / max(total_decided,1) * 100
+        z1, z2, z3 = st.columns(3)
+        z1.metric("✅ Within 45-Day SLA", f"{within_sla} claims", f"{sla_pct:.0f}% of decided", delta_color="off")
+        z2.metric("🔴 SLA Breached",      f"{breached} claims",    f"{100-sla_pct:.0f}% of decided", delta_color="off")
+        z3.metric("Total Decided",         f"{total_decided} claims", help="Approved + denied claims with a recorded decision date.")
 
 # ── Breached/At-Risk Claims Table ─────────────────────────────
 st.subheader("🚨 Claims Requiring Immediate Action")
@@ -206,28 +223,60 @@ else:
 
 # ── Reserve Detail ────────────────────────────────────────────
 st.divider()
-st.subheader("💰 Pending Reserve by Product")
+st.subheader("💰 Pending Reserve by Product Type")
 st.caption(
-    f"Based on a **{approval_rate:.0%} historical approval rate** across all decided claims. "
-    "The reserve is the estimated amount the company needs to hold in cash to cover open claims if approved."
+    f"Based on a **{approval_rate:.0%} historical approval rate**. "
+    "The donut shows how the total reserve is allocated across policy types. "
+    "The table shows the exact dollar figures and open claim counts per product."
 )
-reserve_by_type = (
-    open_claims.groupby("policy_type")["claim_amount"].sum() * approval_rate
-).reset_index()
-reserve_by_type.columns = ["Policy Type","Reserve Estimate"]
-reserve_by_type = reserve_by_type.sort_values("Reserve Estimate", ascending=True)
 
-fig3 = go.Figure(go.Bar(
-    x=reserve_by_type["Reserve Estimate"],
-    y=reserve_by_type["Policy Type"],
-    orientation="h",
-    marker_color=NAVY,
-    text=[f"${v:,.0f}" for v in reserve_by_type["Reserve Estimate"]],
-    textposition="outside",
-))
-fig3.update_layout(
-    height=280, xaxis_title="Reserve Estimate ($)",
-    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    xaxis=dict(showgrid=False), yaxis=dict(showgrid=False),
+from data.colors import PRODUCT_COLORS
+reserve_df = (
+    open_claims.groupby("policy_type")
+    .agg(open_claims_count=("claim_id","count"),
+         open_exposure=("claim_amount","sum"))
+    .reset_index()
 )
-st.plotly_chart(fig3, use_container_width=True)
+reserve_df["reserve_estimate"] = (reserve_df["open_exposure"] * approval_rate).round(0)
+reserve_df = reserve_df.sort_values("reserve_estimate", ascending=False)
+
+col_left, col_right = st.columns([1, 1])
+
+with col_left:
+    fig_res = px.pie(
+        reserve_df,
+        values="reserve_estimate",
+        names="policy_type",
+        hole=0.5,
+        color="policy_type",
+        color_discrete_map=PRODUCT_COLORS,
+    )
+    fig_res.update_traces(
+        textinfo="percent+label",
+        textposition="outside",
+    )
+    fig_res.update_layout(
+        height=320,
+        showlegend=False,
+        paper_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=20, b=20, l=20, r=20),
+    )
+    st.plotly_chart(fig_res, use_container_width=True)
+
+with col_right:
+    total_reserve = reserve_df["reserve_estimate"].sum()
+    st.metric("Total Pending Reserve", f"${total_reserve:,.0f}",
+              help="Sum of estimated payouts across all open claims.")
+    st.dataframe(
+        reserve_df.rename(columns={
+            "policy_type":       "Product",
+            "open_claims_count": "Open Claims",
+            "open_exposure":     "Open Exposure",
+            "reserve_estimate":  "Reserve Estimate",
+        }).style.format({
+            "Open Exposure":    "${:,.0f}",
+            "Reserve Estimate": "${:,.0f}",
+        }),
+        use_container_width=True,
+        hide_index=True,
+    )

@@ -124,9 +124,11 @@ with right:
 # ── Cause of death distribution ───────────────────────────────
 st.subheader("Claims by Cause of Death")
 st.caption(
-    "Navy bars = total claims filed for each cause. "
-    "🔴 Red dots = denial rate for that cause. "
-    "A high denial rate on a specific cause may indicate a policy exclusion or fraud investigation pattern."
+    "Each bar is colored by its **denial rate** — "
+    "🟢 Green = low denial (most claims approved) · "
+    "🟡 Amber = moderate denial · "
+    "🔴 Red = high denial rate (common exclusion or investigation trigger). "
+    "Bar height = total claims. Label shows count and denial %."
 )
 cause = (
     df.groupby("cause_of_death")
@@ -137,35 +139,28 @@ cause = (
     .sort_values("total", ascending=False)
 )
 cause["denial_rate"] = (cause["denied"] / cause["total"] * 100).round(1)
+cause["bar_color"] = cause["denial_rate"].apply(
+    lambda r: GREEN if r < 10 else (AMBER if r < 25 else RED)
+)
+cause["label"] = cause.apply(
+    lambda r: f"{r['total']} claims<br>{r['denial_rate']:.0f}% denied", axis=1
+)
 
-fig3 = go.Figure()
-fig3.add_trace(go.Bar(
+fig3 = go.Figure(go.Bar(
     x=cause["cause_of_death"],
     y=cause["total"],
-    name="Total Claims",
-    marker_color=NAVY,
-    text=cause["total"],
+    marker_color=cause["bar_color"].tolist(),
+    text=cause["label"],
     textposition="outside",
-    yaxis="y1",
-))
-fig3.add_trace(go.Scatter(
-    x=cause["cause_of_death"],
-    y=cause["denial_rate"],
-    name="Denial Rate %",
-    mode="markers+lines",
-    marker=dict(color=RED, size=10, symbol="circle"),
-    line=dict(color=RED, width=2, dash="dot"),
-    yaxis="y2",
 ))
 fig3.update_layout(
-    height=340,
+    height=360,
     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    xaxis=dict(showgrid=False),
-    yaxis=dict(title="Total Claims", gridcolor=GRID, side="left"),
-    yaxis2=dict(title="Denial Rate %", overlaying="y", side="right",
-                range=[0, 100], showgrid=False, ticksuffix="%"),
-    legend=dict(orientation="h", y=1.12),
-    barmode="overlay",
+    xaxis=dict(showgrid=False, title=""),
+    yaxis=dict(gridcolor=GRID, title="Total Claims Filed"),
+    showlegend=False,
+    uniformtext_minsize=8,
+    uniformtext_mode="hide",
 )
 st.plotly_chart(fig3, use_container_width=True)
 

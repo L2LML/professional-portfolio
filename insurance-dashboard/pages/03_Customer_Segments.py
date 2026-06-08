@@ -132,15 +132,22 @@ def cell_label(val):
 
 label_pivot = pivot.applymap(cell_label)
 
+# Scale the color range to the actual data so variation is visible
+actual_max = min(pivot.max().max() * 1.1, 1.5) if not pivot.empty else 1.0
+actual_max = max(actual_max, 0.90)  # at least show the benchmark range
+
+# Color stops anchored to insurance benchmarks (not just 0-1)
+# < 0.70 = green, 0.70-0.85 = amber, > 0.85 = red
 fig3 = px.imshow(
     pivot,
     text_auto=False,
     color_continuous_scale=[
-        [0.0,  GREEN],   # 0.0  = very profitable — green
-        [0.5,  AMBER],   # 0.70 midpoint — amber
-        [1.0,  RED  ],   # 1.0+ = losing money — red
+        [0.0,                  GREEN],
+        [0.70 / actual_max,    AMBER],
+        [0.85 / actual_max,    RED],
+        [1.0,                  "#6B0000"],
     ],
-    zmin=0, zmax=1.0,
+    zmin=0, zmax=actual_max,
     labels=dict(color="Loss Ratio"),
     aspect="auto",
 )
@@ -165,9 +172,15 @@ fig3.update_layout(
     yaxis=dict(title="Age when they bought the policy →"),
     coloraxis_colorbar=dict(
         title="Loss Ratio",
-        tickvals=[0, 0.35, 0.70, 1.0],
-        ticktext=["0.00<br>Very profitable","0.35","0.70<br>Benchmark","1.00<br>Break-even"],
-        len=0.8,
+        tickvals=[0, 0.35, 0.70, 0.85, actual_max],
+        ticktext=[
+            "0.00 Very Profitable",
+            "0.35",
+            "0.70 Benchmark",
+            "0.85 Watch",
+            f"{actual_max:.2f} High Risk",
+        ],
+        len=0.9,
     ),
     margin=dict(t=20, b=60),
 )
