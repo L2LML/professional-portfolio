@@ -170,16 +170,21 @@ st.plotly_chart(fig3, use_container_width=True)
 
 # Insight callout
 if not matrix.empty:
-    best  = matrix.loc[matrix["loss_ratio"].idxmin()]
-    worst = matrix.loc[matrix["loss_ratio"].idxmax()]
+    best      = matrix.loc[matrix["loss_ratio"].idxmin()]
+    worst     = matrix.loc[matrix["loss_ratio"].idxmax()]
+    best_keep = (1 - best["loss_ratio"]) * 100
+    worst_lr  = worst["loss_ratio"]
+    worst_desc = (
+        "claims exceed premiums collected" if worst_lr > 1.0
+        else f"only {(1 - worst_lr) * 100:.0f}¢ margin remaining per premium dollar"
+    )
     col1, col2 = st.columns(2)
     col1.success(
         f"**Most profitable segment:** {best['age_band']} · {best['tenure_tier']}\n\n"
         f"Loss Ratio: **{best['loss_ratio']:.2f}** — "
-        f"the company keeps **{(1-best['loss_ratio'])*100:.0f}¢** of every premium dollar."
+        f"the company keeps **{best_keep:.0f}¢** of every premium dollar."
     )
     col2.error(
         f"**Highest risk segment:** {worst['age_band']} · {worst['tenure_tier']}\n\n"
-        f"Loss Ratio: **{worst['loss_ratio']:.2f}** — "
-        f"{'claims exceed premiums' if worst['loss_ratio'] > 1 else f'only {(1-worst[\"loss_ratio\"])*100:.0f}¢ margin remaining'}."
+        f"Loss Ratio: **{worst_lr:.2f}** — {worst_desc}."
     )

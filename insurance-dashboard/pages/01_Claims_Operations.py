@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
@@ -28,20 +29,44 @@ st.divider()
 
 left, right = st.columns(2)
 
-# ── Aging distribution ────────────────────────────────────────
+# ── Aging by Policy Type ──────────────────────────────────────
 with left:
-    st.subheader("Open Claims Aging")
+    st.subheader("Open Claims Aging by Policy Type")
+    st.caption(
+        "Each bar is an aging category. "
+        "Colors show what **type of policy** the open claims are for — "
+        "so you can see if overdue claims are concentrated in a specific product."
+    )
     if not open_.empty:
-        aging_counts = open_["aging_flag"].value_counts().reset_index()
-        aging_counts.columns = ["Flag", "Count"]
-        COLOR = AGING_COLORS
-        fig = px.bar(aging_counts, x="Flag", y="Count",
-                     color="Flag", color_discrete_map=COLOR,
-                     text="Count")
-        fig.update_traces(textposition="outside")
-        fig.update_layout(showlegend=False, height=300,
-                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                          xaxis=dict(showgrid=False), yaxis=dict(gridcolor="#E2E8F0"))
+        from data.colors import PRODUCT_COLORS
+        aging_type = (
+            open_.groupby(["aging_flag","policy_type"])
+            .size().reset_index(name="count")
+        )
+        # Enforce aging order
+        aging_order = ["ON TRACK","AGING","OVERDUE"]
+        aging_type["aging_flag"] = pd.Categorical(
+            aging_type["aging_flag"], categories=aging_order, ordered=True
+        )
+        aging_type = aging_type.sort_values("aging_flag")
+
+        fig = px.bar(
+            aging_type,
+            x="aging_flag", y="count",
+            color="policy_type",
+            color_discrete_map=PRODUCT_COLORS,
+            barmode="stack",
+            labels={"aging_flag":"Aging Status","count":"Open Claims","policy_type":"Policy Type"},
+            text="count",
+        )
+        fig.update_traces(textposition="inside", textfont_color="white")
+        fig.update_layout(
+            height=320,
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=False),
+            yaxis=dict(gridcolor=GRID),
+            legend=dict(orientation="h", y=1.15, title=""),
+        )
         st.plotly_chart(fig, use_container_width=True)
 
 # ── Examiner workload ─────────────────────────────────────────

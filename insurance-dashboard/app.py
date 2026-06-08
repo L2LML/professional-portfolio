@@ -152,21 +152,23 @@ with right:
                     "Jul","Aug","Sep","Oct","Nov","Dec"]
 
     fig_yoy = go.Figure()
+    # Prior year: gray bars in background (reference)
+    fig_yoy.add_trace(go.Bar(
+        x=month_labels,
+        y=[prev.get(m, 0) for m in months],
+        name=str(prior_year),
+        marker_color=GRAY,
+        opacity=0.5,
+    ))
+    # Current year: navy bars in foreground (what we're watching)
     fig_yoy.add_trace(go.Bar(
         x=month_labels,
         y=[curr.get(m, 0) for m in months],
         name=str(current_year),
         marker_color=NAVY,
     ))
-    fig_yoy.add_trace(go.Scatter(
-        x=month_labels,
-        y=[prev.get(m, 0) for m in months],
-        name=str(prior_year),
-        mode="lines+markers",
-        line=dict(color=SKY, width=2.5, dash="dash"),
-        marker=dict(size=6),
-    ))
     fig_yoy.update_layout(
+        barmode="overlay",
         height=320, margin=dict(t=10, b=10, l=10, r=10),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         xaxis=dict(showgrid=False),

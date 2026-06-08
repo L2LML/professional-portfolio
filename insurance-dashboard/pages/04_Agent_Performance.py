@@ -61,19 +61,40 @@ left, right = st.columns(2)
 
 # ── Agent leaderboard — premium revenue ──────────────────────
 with left:
-    st.subheader("Premium Revenue by Agent")
-    fig1 = go.Figure(go.Bar(
-        x=agents["premium_revenue"] / 1000,
-        y=agents["agent_name"],
+    st.subheader("Premium Revenue by Agent — by Product Type")
+    st.caption(
+        "Stacked bars show each agent's total premium revenue broken down by **policy type**. "
+        "Colors match the product legend used throughout the dashboard."
+    )
+    agent_product = (
+        pol.groupby(["agent_name","policy_type"])["annual_premium"]
+        .sum().reset_index()
+    )
+    # Sort agents by total revenue descending
+    order = agents.sort_values("premium_revenue", ascending=True)["agent_name"].tolist()
+    fig1 = px.bar(
+        agent_product,
+        x="annual_premium", y="agent_name",
+        color="policy_type",
+        color_discrete_map=PRODUCT_COLORS,
         orientation="h",
-        marker_color=NAVY,
-        text=[f"${v/1000:,.0f}K" for v in agents["premium_revenue"]],
-        textposition="outside",
-    ))
-    fig1.update_layout(height=320,
-                       paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                       xaxis=dict(showgrid=False, title="Annual Premium ($K)"),
-                       yaxis=dict(showgrid=False))
+        barmode="stack",
+        category_orders={"agent_name": order},
+        labels={"annual_premium":"Annual Premium ($)","agent_name":"Agent","policy_type":"Product"},
+        text="annual_premium",
+    )
+    fig1.update_traces(
+        texttemplate="$%{text:,.0f}",
+        textposition="inside",
+        textfont_color="white",
+    )
+    fig1.update_layout(
+        height=340,
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(showgrid=False, title="Annual Premium ($)"),
+        yaxis=dict(showgrid=False),
+        legend=dict(orientation="h", y=1.15, title=""),
+    )
     st.plotly_chart(fig1, use_container_width=True)
 
 # ── Policies written vs claims filed scatter ──────────────────
@@ -85,49 +106,51 @@ with right:
         "claims per policy (e.g. several beneficiaries filing on the same policy). "
         "🟢 Green = low (fewer claims per policy) · 🔴 Red = high (more claims per policy)."
     )
-    # Binary color: GREEN = under 1 claim per policy (healthy), RED = over 1 (high exposure)
-    agents["dot_color"] = agents["claims_per_policy"].apply(
-        lambda v: GREEN if v < 1.0 else RED
+    # Color each agent dot by their dominant claim policy type
+    dominant = (
+        df.groupby(["agent_name","policy_type"])
+        .size().reset_index(name="cnt")
     )
-    agents["health_label"] = agents["claims_per_policy"].apply(
-        lambda v: "Healthy (< 1 claim/policy)" if v < 1.0 else "High Exposure (≥ 1 claim/policy)"
-    )
+    dominant = dominant.loc[dominant.groupby("agent_name")["cnt"].idxmax()][["agent_name","policy_type"]]
+    dominant = dominant.rename(columns={"policy_type":"dominant_type"})
+    agents_plot = agents.merge(dominant, on="agent_name", how="left")
+    agents_plot["dominant_type"] = agents_plot["dominant_type"].fillna("Unknown")
 
     fig2 = go.Figure()
-    for label, color in [("Healthy (< 1 claim/policy)", GREEN),
-                          ("High Exposure (≥ 1 claim/policy)", RED)]:
-        subset = agents[agents["health_label"] == label]
+    for ptype, color in PRODUCT_COLORS.items():
+        subset = agents_plot[agents_plot["dominant_type"] == ptype]
         if subset.empty:
             continue
         fig2.add_trace(go.Scatter(
             x=subset["policies"],
             y=subset["total_claims"],
             mode="markers+text",
-            name=label,
+            name=ptype,
             marker=dict(
-                size=(subset["premium_revenue"] / subset["premium_revenue"].max() * 40 + 10).tolist(),
+                size=(subset["premium_revenue"] / agents_plot["premium_revenue"].max() * 40 + 12).tolist(),
                 color=color,
-                opacity=0.85,
+                opacity=0.9,
                 line=dict(color="white", width=1.5),
             ),
             text=subset["agent_name"].str.split().str[-1],
             textposition="top center",
-            customdata=subset[["claims_per_policy","premium_revenue"]].values,
+            customdata=subset[["claims_per_policy","premium_revenue","dominant_type"]].values,
             hovertemplate=(
                 "<b>%{text}</b><br>"
                 "Policies Written: %{x}<br>"
                 "Claims Filed: %{y}<br>"
+                "Dominant Claim Type: %{customdata[2]}<br>"
                 "Claims per Policy: %{customdata[0]:.2f}<br>"
                 "Annual Premium: $%{customdata[1]:,.0f}<extra></extra>"
             ),
         ))
 
     fig2.update_layout(
-        height=340,
+        height=360,
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         xaxis=dict(gridcolor=GRID, title="Policies Written"),
         yaxis=dict(gridcolor=GRID, title="Claims Filed"),
-        legend=dict(orientation="h", y=1.12, title=""),
+        legend=dict(orientation="h", y=1.15, title="Dominant Claim Type:"),
     )
     st.plotly_chart(fig2, use_container_width=True)
 
