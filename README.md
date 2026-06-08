@@ -23,6 +23,24 @@ A **4-week live client engagement** completed through Siena Heights University P
 
 ---
 
+### 🗄️ Life Insurance Claims Database
+**Folder:** [`/life-insurance-claims-db`](./life-insurance-claims-db)
+
+A PostgreSQL relational database modeling the full lifecycle of life insurance policies, claims, and beneficiary payments — from policy issuance through payment disbursement.
+
+| | |
+|---|---|
+| **Type** | Solo Project — Database Design & SQL Analytics |
+| **Stack** | PostgreSQL · SQL |
+| **Schema** | 9 tables · check constraints · indexes · 4 views · ERD diagram |
+| **Queries** | 21 queries — INNER/LEFT/FULL OUTER JOINs, UNION, EXCEPT, window functions, multi-step CTEs, EXPLAIN ANALYZE |
+| **Triggers** | 4 triggers — audit trail, auto-timestamp, beneficiary validation, policy active check |
+| **Stored Procs** | 4 PL/pgSQL functions — full claims workflow from filing through payment |
+| **Domain** | Life insurance · claims adjudication · beneficiary management · risk reporting |
+| **Skills** | Relational Modeling · Advanced SQL · PostgreSQL · PL/pgSQL · Insurance Domain Knowledge |
+
+---
+
 ### ⚖️ Legal Exhibit PDF Builder
 **Folder:** [`/legal-exhibit-pdf-builder`](./legal-exhibit-pdf-builder)
 
