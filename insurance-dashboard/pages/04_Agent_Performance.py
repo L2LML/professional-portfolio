@@ -25,6 +25,15 @@ agent_policies = (
          total_coverage=("face_value","sum"))
     .reset_index()
 )
+# Claim rate = % of policies that have had AT LEAST ONE claim filed
+# (unique policies with claims / total policies written by agent)
+policies_with_claims = (
+    df[["agent_name","policy_number"]]
+    .drop_duplicates()
+    .groupby("agent_name")
+    .size()
+    .reset_index(name="policies_with_claims")
+)
 agent_claims = (
     df.groupby("agent_name")
     .agg(total_claims=("claim_id","count"),
@@ -32,9 +41,19 @@ agent_claims = (
          paid_claims=("claim_status", lambda x: (x=="paid").sum()))
     .reset_index()
 )
-agents = agent_policies.merge(agent_claims, on="agent_name", how="left").fillna(0)
-agents["claim_rate_pct"] = (agents["total_claims"] / agents["policies"] * 100).round(1)
-agents["premium_to_claim"] = (agents["premium_revenue"] / agents["claim_exposure"].replace(0, float("nan"))).round(2)
+agents = (
+    agent_policies
+    .merge(agent_claims,        on="agent_name", how="left")
+    .merge(policies_with_claims, on="agent_name", how="left")
+    .fillna(0)
+)
+# Claim rate: % of policies that generated at least one claim (0–100%)
+agents["claim_rate_pct"] = (
+    agents["policies_with_claims"] / agents["policies"] * 100
+).round(1).clip(0, 100)
+agents["premium_to_claim"] = (
+    agents["premium_revenue"] / agents["claim_exposure"].replace(0, float("nan"))
+).round(2)
 agents = agents.sort_values("premium_revenue", ascending=False)
 
 # ── KPIs ──────────────────────────────────────────────────────
@@ -66,19 +85,43 @@ with left:
 # ── Policies written vs claims filed scatter ──────────────────
 with right:
     st.subheader("Policies Written vs Claims Filed")
+    st.caption(
+        "**Claim Rate** = % of an agent's policies that have had at least one claim filed. "
+        "🟢 Green = low claim rate (fewer policies triggered claims) · "
+        "🔴 Red = high claim rate (more policies resulted in claims)."
+    )
     fig2 = px.scatter(
         agents, x="policies", y="total_claims",
         size="premium_revenue", color="claim_rate_pct",
         hover_name="agent_name",
-        color_continuous_scale=["#047857","#D97706","#DC2626"],
-        labels={"policies":"Policies Written","total_claims":"Claims Filed",
-                "claim_rate_pct":"Claim Rate %"},
+        hover_data={"claim_rate_pct": ":.1f",
+                    "premium_revenue": ":$,.0f",
+                    "policies": True},
+        color_continuous_scale=[
+            [0.0,  "#047857"],   # 0%  — green (good)
+            [0.5,  "#FACC15"],   # 50% — yellow (watch)
+            [1.0,  "#DC2626"],   # 100% — red (high risk)
+        ],
+        range_color=[0, 100],
+        labels={
+            "policies":      "Policies Written",
+            "total_claims":  "Claims Filed",
+            "claim_rate_pct":"Claim Rate %",
+            "premium_revenue":"Annual Premium",
+        },
         size_max=40,
     )
-    fig2.update_layout(height=320,
-                       paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                       xaxis=dict(gridcolor="#E2E8F0"), yaxis=dict(gridcolor="#E2E8F0"),
-                       coloraxis_colorbar=dict(title="Claim Rate %"))
+    fig2.update_layout(
+        height=340,
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(gridcolor="#E2E8F0"),
+        yaxis=dict(gridcolor="#E2E8F0"),
+        coloraxis_colorbar=dict(
+            title="Claim Rate %",
+            ticksuffix="%",
+            tickvals=[0, 25, 50, 75, 100],
+        ),
+    )
     st.plotly_chart(fig2, use_container_width=True)
 
 # ── Full agent leaderboard table ──────────────────────────────
