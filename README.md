@@ -23,6 +23,21 @@ A **4-week live client engagement** completed through Siena Heights University P
 
 ---
 
+### ⚖️ Legal Exhibit PDF Builder
+**Folder:** [`/legal-exhibit-pdf-builder`](./legal-exhibit-pdf-builder)
+
+A Python automation tool that compiles evidence documents, photos, and receipts from an Excel tracker into a single paginated PDF exhibit package — cover page, exhibit headers, page numbers, and mixed media (images + PDFs). Built for administrative and legal filings.
+
+| | |
+|---|---|
+| **Type** | Solo Project — Python Automation Tool |
+| **Stack** | Python · ReportLab · Pillow · pillow-heif · OpenCV · openpyxl |
+| **Highlight** | Excel-driven build; writes page numbers back to tracker automatically |
+| **Use Cases** | Legal filings · Insurance claims · Tax appeals · Administrative hearings |
+| **Skills** | Python Scripting · PDF Generation · Excel Integration · CLI Tool Design · File Automation |
+
+---
+
 ### 📈 Virtual Stock Market
 **Folder:** [`/virtual-stock-market`](./virtual-stock-market)
 
