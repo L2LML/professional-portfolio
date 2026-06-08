@@ -98,7 +98,6 @@ st.dataframe(
         "Total Coverage":"${:,.0f}",
         "Claim Rate %":"{:.1f}%",
         "Premium/Claim":"{:.2f}",
-    }).background_gradient(subset=["Annual Premium"], cmap="Blues")
-     .background_gradient(subset=["Claim Rate %"], cmap="RdYlGn_r"),
+    }),
     use_container_width=True, hide_index=True,
 )
