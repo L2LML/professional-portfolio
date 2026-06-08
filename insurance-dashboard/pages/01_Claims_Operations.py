@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.load_data import load_claims_fact
-from data.colors import AGING_COLORS, BLUE, NAVY, GRID, TEXT_MID, STATUS_COLORS
+from data.colors import AGING_COLORS, BLUE, SKY, NAVY, GRID, TEXT_MID, STATUS_COLORS, AMBER
 
 st.set_page_config(page_title="Claims Operations", page_icon="📋", layout="wide")
 st.title("📋 Claims Operations")
@@ -105,3 +105,74 @@ st.dataframe(
     }).style.format({"Amount":"${:,.0f}","Days Open":"{:.0f}"}),
     use_container_width=True, hide_index=True,
 )
+
+# ── Examiner Consistency ──────────────────────────────────────
+st.divider()
+st.subheader("🔍 Examiner Decision Consistency")
+st.info(
+    "**Why this matters:** If one examiner approves 90% of claims while another approves only 40%, "
+    "that inconsistency is a compliance and fairness risk. Regulators and auditors look for this. "
+    "Examiners should be making similar decisions on similar claims.\n\n"
+    "The chart below shows each examiner's **approval rate** vs their **average decision time**. "
+    "The ideal examiner is in the **bottom-right** — fast decisions, consistent approval rate near the team average."
+)
+
+decided = df[df["claim_status"].isin(["paid","approved","denied"])].copy()
+if not decided.empty:
+    exam_stats = (
+        decided.groupby("assigned_examiner")
+        .agg(
+            total=("claim_id","count"),
+            approved=("claim_status", lambda x: x.isin(["paid","approved"]).sum()),
+            avg_days=("days_to_decision","mean"),
+        )
+        .reset_index()
+    )
+    exam_stats["approval_rate"] = (exam_stats["approved"] / exam_stats["total"] * 100).round(1)
+    avg_approval = exam_stats["approval_rate"].mean()
+    avg_days     = exam_stats["avg_days"].mean()
+
+    fig_ex = go.Figure()
+    for _, row in exam_stats.iterrows():
+        fig_ex.add_trace(go.Scatter(
+            x=[row["avg_days"]],
+            y=[row["approval_rate"]],
+            mode="markers+text",
+            marker=dict(
+                size=row["total"] * 4 + 12,
+                color=NAVY,
+                line=dict(color=SKY, width=2),
+            ),
+            text=[row["assigned_examiner"].split()[-1]],
+            textposition="top center",
+            name=row["assigned_examiner"],
+            showlegend=False,
+            hovertemplate=(
+                f"<b>{row['assigned_examiner']}</b><br>"
+                f"Approval Rate: {row['approval_rate']:.1f}%<br>"
+                f"Avg Days: {row['avg_days']:.0f}<br>"
+                f"Total Decided: {row['total']}"
+            ),
+        ))
+
+    # Team average lines
+    fig_ex.add_hline(y=avg_approval, line_dash="dash", line_color=AMBER, line_width=1.5,
+                     annotation_text=f"Team avg approval {avg_approval:.0f}%",
+                     annotation_font_color=AMBER)
+    fig_ex.add_vline(x=avg_days, line_dash="dash", line_color=SKY, line_width=1.5,
+                     annotation_text=f"Team avg {avg_days:.0f} days",
+                     annotation_font_color=SKY)
+
+    fig_ex.update_layout(
+        height=340,
+        xaxis=dict(title="Average Days to Decision", gridcolor=GRID),
+        yaxis=dict(title="Approval Rate (%)", gridcolor=GRID, range=[0, 105]),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=20, b=20),
+    )
+    st.plotly_chart(fig_ex, use_container_width=True)
+    st.caption(
+        "Bubble size = number of claims decided. "
+        "Dashed lines show team averages. "
+        "Examiners far from the average approval rate line warrant review."
+    )
