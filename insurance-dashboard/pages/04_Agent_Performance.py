@@ -121,23 +121,57 @@ with right:
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-# ── Full agent leaderboard table ──────────────────────────────
-st.subheader("Agent Leaderboard")
-display = agents[[
-    "agent_name","agent_state","policies","premium_revenue",
-    "total_coverage","total_claims","claims_per_policy","premium_to_claim"
-]].rename(columns={
-    "agent_name":"Agent","agent_state":"State",
-    "policies":"Policies Written","premium_revenue":"Annual Premium",
-    "total_coverage":"Total Coverage","total_claims":"Total Claims",
-    "claims_per_policy":"Claims / Policy","premium_to_claim":"Premium/Claim Ratio"
-})
-st.dataframe(
-    display.style.format({
-        "Annual Premium":      "${:,.0f}",
-        "Total Coverage":      "${:,.0f}",
-        "Claims / Policy":     "{:.2f}",
-        "Premium/Claim Ratio": "{:.2f}",
-    }),
-    use_container_width=True, hide_index=True,
+# ── Portfolio Mix — what product types each agent is selling ──
+st.subheader("Agent Portfolio Mix — Policy Type Breakdown")
+st.caption(
+    "Permanent policies (Whole Life, Universal Life, Variable Life) generate long-term "
+    "premium revenue and build cash value. A healthy agent portfolio balances term and "
+    "permanent products. Agents with more permanent policies deliver higher lifetime value."
 )
+
+mix = (
+    pol.groupby(["agent_name","policy_type"])
+    .size()
+    .reset_index(name="count")
+)
+
+PERM_COLORS = {
+    "Term Life":      "#94A3B8",   # gray    — expires, no cash value
+    "Whole Life":     "#1E2761",   # navy    — permanent, guaranteed cash value
+    "Universal Life": "#0284C7",   # blue    — permanent, flexible
+    "Variable Life":  "#7C3AED",   # purple  — permanent, investment-linked
+    "Final Expense":  "#047857",   # green   — small permanent, simplified issue
+}
+
+fig3 = px.bar(
+    mix,
+    x="agent_name", y="count",
+    color="policy_type",
+    color_discrete_map=PERM_COLORS,
+    labels={"agent_name": "Agent", "count": "Policies Written", "policy_type": "Product"},
+    barmode="stack",
+)
+fig3.update_layout(
+    height=340,
+    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+    xaxis=dict(showgrid=False, title=""),
+    yaxis=dict(gridcolor="#E2E8F0", title="Policies Written"),
+    legend=dict(orientation="h", y=1.12, title=""),
+)
+st.plotly_chart(fig3, use_container_width=True)
+
+# ── Revenue efficiency callouts ────────────────────────────────
+st.subheader("Revenue Efficiency")
+st.caption("Annual premium per policy written — higher means the agent is selling higher-value coverage.")
+
+eff = agents.copy()
+eff["premium_per_policy"] = (eff["premium_revenue"] / eff["policies"]).round(0)
+eff = eff.sort_values("premium_per_policy", ascending=False)
+
+cols = st.columns(len(eff))
+for col, row in zip(cols, eff.itertuples()):
+    col.metric(
+        label=row.agent_name.split()[-1],   # last name only to fit
+        value=f"${row.premium_per_policy:,.0f}",
+        delta=f"{row.policies} policies",
+    )
