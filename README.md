@@ -41,6 +41,22 @@ A PostgreSQL relational database modeling the full lifecycle of life insurance p
 
 ---
 
+### ☁️ Insurance Claims Cloud Migration Pipeline
+**Folder:** [`/insurance-cloud-migration`](./insurance-cloud-migration)
+
+A Python ETL pipeline that migrates the life insurance claims database from PostgreSQL to AWS S3 as a Parquet data lake. Direct continuation of the SQL project above.
+
+| | |
+|---|---|
+| **Type** | Solo Project — Data Engineering / Cloud Migration |
+| **Stack** | Python · pandas · SQLAlchemy · pyarrow · boto3 · matplotlib · seaborn |
+| **Pipeline** | Extract → Transform → Validate (20+ checks) → Visualize → Load |
+| **Output** | Snappy-compressed Parquet · 5 audit charts · Validation JSON report |
+| **Cloud** | AWS S3 data lake with versioned, partitioned keys; BigQuery + Snowflake patterns included |
+| **Skills** | ETL Design · Data Quality · Parquet · AWS S3 · pandas · Data Visualization |
+
+---
+
 ### ⚖️ Legal Exhibit PDF Builder
 **Folder:** [`/legal-exhibit-pdf-builder`](./legal-exhibit-pdf-builder)
 
