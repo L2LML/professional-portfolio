@@ -83,39 +83,102 @@ fig2.update_layout(
 )
 st.plotly_chart(fig2, use_container_width=True)
 
-# ── Age × Tenure Profitability Matrix ─────────────────────────
-st.subheader("Age × Tenure Profitability Matrix")
-st.caption("Premium-to-claim ratio — higher = more profitable segment")
+# ── Age × Tenure Loss Ratio Matrix ───────────────────────────
+st.subheader("Which Customer Segments Are Most Profitable?")
+st.info(
+    "**How to read this chart:**\n\n"
+    "Each cell shows the **Loss Ratio** for that customer group — "
+    "the same metric explained on the Financial Analysis page.\n\n"
+    "**Loss Ratio = Claims Paid ÷ Premiums Collected**\n\n"
+    "- 🟢 **Green (below 0.70)** — Healthy. This group pays in more than they claim. "
+    "The company keeps at least 30 cents of every premium dollar.\n"
+    "- 🟡 **Amber (0.70 – 1.00)** — Watch zone. Claims are eating into premiums.\n"
+    "- 🔴 **Red (above 1.00)** — Losing money on this segment. Claims exceed premiums collected.\n\n"
+    "Use this to identify which age groups and tenure tiers drive profit — and which need pricing review."
+)
 
-matrix_data = (
-    df[df["age_band"].notna() & df["tenure_tier"].notna()]
-    .groupby(["age_band","tenure_tier"])
-    .agg(claims=("claim_id","count"), exposure=("claim_amount","sum"))
-    .reset_index()
+paid_matrix = (
+    df[df["claim_status"] == "paid"]
+    [df["age_band"].notna() & df["tenure_tier"].notna()]
+    .groupby(["age_band","tenure_tier"])["claim_amount"].sum()
+    .reset_index().rename(columns={"claim_amount":"claims_paid"})
 )
 pol_matrix = (
     pol[pol["age_band"].notna() & pol["tenure_tier"].notna()]
-    .groupby(["age_band","tenure_tier"])
-    .agg(premium=("annual_premium","sum"), policies=("policy_id","count"))
-    .reset_index()
+    .groupby(["age_band","tenure_tier"])["annual_premium"].sum()
+    .reset_index().rename(columns={"annual_premium":"premiums"})
 )
-matrix = pol_matrix.merge(matrix_data, on=["age_band","tenure_tier"], how="left").fillna(0)
-matrix["profit_ratio"] = (matrix["premium"] / matrix["exposure"].replace(0, float("nan"))).round(2)
+matrix = pol_matrix.merge(paid_matrix, on=["age_band","tenure_tier"], how="left").fillna(0)
+matrix["loss_ratio"] = (
+    matrix["claims_paid"] / matrix["premiums"].replace(0, float("nan"))
+).round(2)
 
-pivot = matrix.pivot(index="age_band", columns="tenure_tier", values="profit_ratio")
+pivot = matrix.pivot(index="age_band", columns="tenure_tier", values="loss_ratio")
 pivot = pivot.reindex(index=[a for a in AGE_ORDER if a in pivot.index])
 pivot = pivot.reindex(columns=[t for t in TENURE_ORDER if t in pivot.columns])
 
+# Label each cell with the loss ratio AND a plain-English zone
+def cell_label(val):
+    if pd.isna(val):
+        return "No data"
+    zone = "✅ Healthy" if val < 0.70 else ("⚠️ Watch" if val < 1.0 else "🔴 High Risk")
+    return f"{val:.2f}\n{zone}"
+
+label_pivot = pivot.applymap(cell_label)
+
 fig3 = px.imshow(
-    pivot, text_auto=".2f",
-    color_continuous_scale=[RED, AMBER, GREEN],
-    labels=dict(color="Premium/Claim Ratio"),
+    pivot,
+    text_auto=False,
+    color_continuous_scale=[
+        [0.0,  GREEN],   # 0.0  = very profitable — green
+        [0.5,  AMBER],   # 0.70 midpoint — amber
+        [1.0,  RED  ],   # 1.0+ = losing money — red
+    ],
+    zmin=0, zmax=1.0,
+    labels=dict(color="Loss Ratio"),
     aspect="auto",
 )
+
+# Add cell annotations manually with both number and zone label
+for i, age in enumerate(pivot.index):
+    for j, tenure in enumerate(pivot.columns):
+        val = pivot.loc[age, tenure]
+        if pd.notna(val):
+            zone = "✅ Healthy" if val < 0.70 else ("⚠️ Watch" if val < 1.0 else "🔴 High")
+            fig3.add_annotation(
+                x=j, y=i,
+                text=f"<b>{val:.2f}</b><br><span style='font-size:10px'>{zone}</span>",
+                showarrow=False,
+                font=dict(color="white" if val > 0.45 else NAVY, size=12),
+            )
+
 fig3.update_layout(
-    height=320, paper_bgcolor="rgba(0,0,0,0)",
-    xaxis_title="Tenure Tier", yaxis_title="Age Band at Issuance",
-    coloraxis_colorbar=dict(title="Ratio"),
+    height=360,
+    paper_bgcolor="rgba(0,0,0,0)",
+    xaxis=dict(title="How long they've been a customer →", side="bottom"),
+    yaxis=dict(title="Age when they bought the policy →"),
+    coloraxis_colorbar=dict(
+        title="Loss Ratio",
+        tickvals=[0, 0.35, 0.70, 1.0],
+        ticktext=["0.00<br>Very profitable","0.35","0.70<br>Benchmark","1.00<br>Break-even"],
+        len=0.8,
+    ),
+    margin=dict(t=20, b=60),
 )
 st.plotly_chart(fig3, use_container_width=True)
-st.caption("🟢 Green = high premium-to-claim ratio (profitable)  ·  🔴 Red = high claim exposure relative to premiums")
+
+# Insight callout
+if not matrix.empty:
+    best  = matrix.loc[matrix["loss_ratio"].idxmin()]
+    worst = matrix.loc[matrix["loss_ratio"].idxmax()]
+    col1, col2 = st.columns(2)
+    col1.success(
+        f"**Most profitable segment:** {best['age_band']} · {best['tenure_tier']}\n\n"
+        f"Loss Ratio: **{best['loss_ratio']:.2f}** — "
+        f"the company keeps **{(1-best['loss_ratio'])*100:.0f}¢** of every premium dollar."
+    )
+    col2.error(
+        f"**Highest risk segment:** {worst['age_band']} · {worst['tenure_tier']}\n\n"
+        f"Loss Ratio: **{worst['loss_ratio']:.2f}** — "
+        f"{'claims exceed premiums' if worst['loss_ratio'] > 1 else f'only {(1-worst[\"loss_ratio\"])*100:.0f}¢ margin remaining'}."
+    )
