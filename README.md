@@ -34,7 +34,7 @@ Interactive, multi-page BI dashboard for life insurance claims operations. Cover
 | **Stack** | Python · Streamlit · Plotly · pandas · pyarrow |
 | **Pages** | Executive Summary · Claims Operations · Financial Analysis · Customer Segments · Agent Performance · SLA & Compliance |
 | **Key metrics** | Loss Ratio · SLA compliance · Pending reserve · YoY trend arrows · Age × Tenure profitability heatmap |
-| **Deploy** | Run locally: `streamlit run app.py` — or deploy free at [share.streamlit.io](https://share.streamlit.io) |
+| **Live Demo** | 👉 **[lisa-insurance-claims.streamlit.app](https://lisa-insurance-claims.streamlit.app)** — opens in any browser, no install |
 | **Skills** | Dashboard Design · Streamlit · Plotly · Insurance Domain · Data Storytelling · pandas |
 
 ---

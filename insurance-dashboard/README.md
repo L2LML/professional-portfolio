@@ -8,7 +8,9 @@ An interactive, multi-page business intelligence dashboard for life insurance cl
 
 ## 🚀 View the Live Dashboard
 
-> **Deploy URL coming soon** — see [How to Deploy](#how-to-deploy) below.
+**👉 [https://lisa-insurance-claims.streamlit.app](https://lisa-insurance-claims.streamlit.app)**
+
+Opens instantly in any browser — no login, no install required.
 
 ---
 
