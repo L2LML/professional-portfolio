@@ -131,11 +131,10 @@ Click **"Create app"** and fill in:
 Click **"Deploy!"** — Streamlit Cloud installs dependencies automatically from `requirements.txt` and launches the app. Takes about 2 minutes.
 
 Your dashboard will be live at:
-```
-https://lisa-insurance-dashboard.streamlit.app
-```
 
-Share that URL with anyone — no login, no install, opens instantly in any browser.
+**[https://lisa-insurance-claims.streamlit.app](https://lisa-insurance-claims.streamlit.app)**
+
+Share that link with anyone — no login, no install, opens instantly in any browser.
 
 ---
 
