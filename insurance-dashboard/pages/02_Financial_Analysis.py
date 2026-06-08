@@ -34,7 +34,11 @@ c1.metric("Total Paid",       f"${paid['claim_amount'].sum()/1e6:.2f}M")
 c2.metric("Avg Claim (Paid)", f"${paid['claim_amount'].mean():,.0f}")
 c3.metric("Largest Claim",    f"${df['claim_amount'].max():,.0f}")
 pol["total_collected"] = pol["annual_premium"] * pol["years_in_force"].clip(lower=1)
-c4.metric("Total Premiums Collected",  f"${pol['total_collected'].sum()/1e6:.2f}M")
+overall_lr = paid["claim_amount"].sum() / max(pol["total_collected"].sum(), 1)
+lr_zone = "🟢 Healthy" if overall_lr < 0.70 else ("🟡 Watch" if overall_lr < 0.85 else "🔴 High Risk")
+c4.metric("Portfolio Loss Ratio", f"{overall_lr:.2f}",
+          delta=lr_zone, delta_color="off",
+          help="Total claims paid ÷ total premiums collected. Below 0.70 is healthy.")
 st.divider()
 
 left, right = st.columns(2)

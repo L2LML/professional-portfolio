@@ -48,18 +48,15 @@ filtered = df[
 st.sidebar.divider()
 st.sidebar.caption(f"Showing **{len(filtered):,}** of {len(df):,} claims")
 
-# ── Computed metrics ──────────────────────────────────────────
-total_claims    = len(filtered)
-total_paid      = filtered[filtered["claim_status"] == "paid"]["claim_amount"].sum()
-# Loss ratio = claims paid ÷ total premiums COLLECTED over the policy lifetime
-# (annual premium × years in force per policy) — apples-to-apples comparison
-total_premiums  = (pol["annual_premium"] * pol["years_in_force"].clip(lower=1)).sum()
-loss_ratio      = total_paid / total_premiums if total_premiums > 0 else 0
-avg_processing  = filtered["days_to_decision"].dropna().mean()
+# ── Computed metrics — current period ────────────────────────
+total_claims   = len(filtered)
+total_paid     = filtered[filtered["claim_status"] == "paid"]["claim_amount"].sum()
+total_premiums = (pol["annual_premium"] * pol["years_in_force"].clip(lower=1)).sum()
+loss_ratio     = total_paid / total_premiums if total_premiums > 0 else 0
+avg_processing = filtered["days_to_decision"].dropna().mean()
 
-# Pending reserve = open claim exposure × historical approval rate
-decided         = filtered[filtered["claim_status"].isin(["paid","approved","denied"])]
-approval_rate   = (
+decided      = filtered[filtered["claim_status"].isin(["paid","approved","denied"])]
+approval_rate = (
     len(decided[decided["claim_status"].isin(["paid","approved"])]) /
     max(len(decided), 1)
 )
@@ -68,31 +65,101 @@ open_exposure   = filtered[
 ]["claim_amount"].sum()
 pending_reserve = open_exposure * approval_rate
 
-# SLA: decisions made within 45 days
-decided_claims      = filtered[filtered["days_to_decision"].notna()]
-sla_compliant_pct   = (
+decided_claims    = filtered[filtered["days_to_decision"].notna()]
+sla_compliant_pct = (
     (decided_claims["days_to_decision"] <= 45).sum() /
     max(len(decided_claims), 1) * 100
 )
 
-# ── KPI Cards ─────────────────────────────────────────────────
-st.subheader("Key Performance Indicators")
-c1, c2, c3, c4, c5 = st.columns(5)
+# ── Year-over-year trend calculations ────────────────────────
+curr_yr = int(filtered["claim_year"].max()) if len(filtered) else 2024
+prev_yr = curr_yr - 1
 
-c1.metric("Total Claims Filed",  f"{total_claims:,}")
+curr_df = filtered[filtered["claim_year"] == curr_yr]
+prev_df = filtered[filtered["claim_year"] == prev_yr]
 
-# Loss ratio: color-code the delta message
+def safe_delta(curr_val, prev_val, fmt=".0f", invert=False):
+    """Return (delta_str, delta_color) for st.metric."""
+    if prev_val == 0:
+        return None, "off"
+    delta = curr_val - prev_val
+    pct   = delta / abs(prev_val) * 100
+    sign  = "+" if pct > 0 else ""
+    label = f"{sign}{pct:.1f}% vs {prev_yr}"
+    # For inverse metrics: rising = bad = red, falling = good = green
+    color = "inverse" if invert else "normal"
+    return label, color
+
+# Claims filed trend (more claims = more exposure = inverse color)
+curr_claims_n = len(curr_df)
+prev_claims_n = len(prev_df)
+claims_delta, claims_color = safe_delta(curr_claims_n, max(prev_claims_n,1), invert=True)
+
+# Paid out trend (more paid = worse = inverse)
+curr_paid_n = curr_df[curr_df["claim_status"]=="paid"]["claim_amount"].sum()
+prev_paid_n = prev_df[prev_df["claim_status"]=="paid"]["claim_amount"].sum()
+paid_delta, paid_color = safe_delta(curr_paid_n, max(prev_paid_n,1), invert=True)
+
+# Loss ratio trend (higher = worse = inverse)
+prev_paid_all = filtered[
+    (filtered["claim_year"] == prev_yr) &
+    (filtered["claim_status"] == "paid")
+]["claim_amount"].sum()
+prev_lr = prev_paid_all / (total_premiums * 0.5) if total_premiums > 0 else 0
+lr_delta_val = loss_ratio - prev_lr
+lr_delta_str = f"{'↑' if lr_delta_val > 0 else '↓'} {abs(lr_delta_val):.2f} vs {prev_yr}"
+lr_delta_color = "inverse"   # higher loss ratio = red arrow
+
+# Avg decision time trend (faster = better = inverse)
+curr_avg = curr_df["days_to_decision"].dropna().mean()
+prev_avg = prev_df["days_to_decision"].dropna().mean()
+avg_delta, avg_color = safe_delta(
+    curr_avg if pd.notna(curr_avg) else 0,
+    max(prev_avg if pd.notna(prev_avg) else 1, 1),
+    invert=True
+)
+
+# Loss ratio zone label
 lr_label = (
-    "🟢 Healthy"   if loss_ratio < 0.70 else
-    "🟡 Watch"     if loss_ratio < 0.85 else
+    "🟢 Healthy"  if loss_ratio < 0.70 else
+    "🟡 Watch"    if loss_ratio < 0.85 else
     "🔴 High Risk"
 )
-c2.metric("Loss Ratio", f"{loss_ratio:.2f}", lr_label,
-          delta_color="off")
 
-c3.metric("Total Paid Out",        f"${total_paid/1_000_000:.2f}M")
-c4.metric("Avg Decision Time",     f"{avg_processing:.0f} days" if pd.notna(avg_processing) else "—")
-c5.metric("Pending Reserve Est.",  f"${pending_reserve:,.0f}")
+# ── KPI Cards with trend arrows ───────────────────────────────
+st.subheader("Key Performance Indicators")
+st.caption(f"Trend arrows compare **{curr_yr}** vs **{prev_yr}**. "
+           "🟢 Green = improving. 🔴 Red = worsening.")
+
+c1, c2, c3, c4, c5 = st.columns(5)
+
+c1.metric(
+    "Total Claims Filed", f"{total_claims:,}",
+    delta=claims_delta, delta_color=claims_color,
+    help="Total claims across all years. Arrow = current year vs prior year."
+)
+c2.metric(
+    "Loss Ratio", f"{loss_ratio:.2f}",
+    delta=lr_delta_str, delta_color=lr_delta_color,
+    help="Claims paid ÷ total premiums collected. Below 0.70 = healthy."
+)
+c3.metric(
+    "Total Paid Out", f"${total_paid/1_000_000:.2f}M",
+    delta=paid_delta, delta_color=paid_color,
+    help="Dollar amount disbursed to beneficiaries."
+)
+c4.metric(
+    "Avg Decision Time",
+    f"{avg_processing:.0f} days" if pd.notna(avg_processing) else "—",
+    delta=avg_delta, delta_color=avg_color,
+    help="Average days from claim filing to approval or denial. Lower is better."
+)
+c5.metric(
+    "Pending Reserve Est.", f"${pending_reserve:,.0f}",
+    delta=f"{lr_label}  ·  SLA {sla_compliant_pct:.0f}%",
+    delta_color="off",
+    help="Estimated liability on open claims × historical approval rate."
+)
 
 # ── Metric explanations ───────────────────────────────────────
 with st.expander("📖 What do these numbers mean?"):

@@ -51,10 +51,21 @@ agents["premium_to_claim"] = (
 agents = agents.sort_values("premium_revenue", ascending=False)
 
 # ── KPIs ──────────────────────────────────────────────────────
-c1, c2, c3 = st.columns(3)
-c1.metric("Total Agents",    len(agents))
-c2.metric("Total Premiums",  f"${agents['premium_revenue'].sum()/1e6:.2f}M")
-c3.metric("Total Coverage",  f"${agents['total_coverage'].sum()/1e6:.1f}M")
+top_agent    = agents.iloc[0]["agent_name"] if not agents.empty else "—"
+avg_prem_pol = (agents["premium_revenue"] / agents["policies"].replace(0,1)).mean()
+high_exposure = (agents["claims_per_policy"] >= 1.0).sum()
+
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Total Agents", len(agents),
+          help="Number of active licensed agents in the portfolio.")
+c2.metric("Total Annual Premiums", f"${agents['premium_revenue'].sum()/1e6:.2f}M",
+          help="Sum of all annual premiums written across all agents.")
+c3.metric("Avg Premium per Policy", f"${avg_prem_pol:,.0f}",
+          help="Higher = agents are writing higher-value coverage on average.")
+c4.metric("Agents with High Exposure", f"{high_exposure} of {len(agents)}",
+          delta="≥ 1 claim per policy written",
+          delta_color="off" if high_exposure == 0 else "inverse",
+          help="Agents where total claims filed equals or exceeds policies written.")
 st.divider()
 
 left, right = st.columns(2)

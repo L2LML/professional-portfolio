@@ -19,12 +19,26 @@ st.divider()
 df    = load_claims_fact()
 open_ = df[df["claim_status"].isin(["pending","under_review"])].copy()
 
-# ── KPIs ──────────────────────────────────────────────────────
+# ── KPIs with context ────────────────────────────────────────
+total_open    = len(open_)
+n_overdue     = (open_["aging_flag"] == "OVERDUE").sum()
+n_aging       = (open_["aging_flag"] == "AGING").sum()
+n_on_track    = (open_["aging_flag"] == "ON TRACK").sum()
+pct_overdue   = n_overdue / max(total_open, 1) * 100
+
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Open Claims",    len(open_))
-c2.metric("Overdue (60+d)", (open_["aging_flag"] == "OVERDUE").sum())
-c3.metric("Aging (30–60d)", (open_["aging_flag"] == "AGING").sum())
-c4.metric("On Track",       (open_["aging_flag"] == "ON TRACK").sum())
+c1.metric("Open Claims",    total_open,
+          help="All claims not yet decided — pending + under review.")
+c2.metric("Overdue (45+d)", n_overdue,
+          delta=f"{pct_overdue:.0f}% of open claims",
+          delta_color="off" if n_overdue == 0 else "inverse",
+          help="Past the 45-day regulatory deadline. Immediate action required.")
+c3.metric("At Risk (30–44d)", n_aging,
+          help="Approaching the 45-day deadline. Assign or escalate now.")
+c4.metric("On Track (<30d)", n_on_track,
+          delta="✅ Within SLA" if n_on_track > 0 else "—",
+          delta_color="off",
+          help="Claims filed recently — still within regulatory timeframe.")
 st.divider()
 
 left, right = st.columns(2)
