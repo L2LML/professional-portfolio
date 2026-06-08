@@ -51,7 +51,9 @@ st.sidebar.caption(f"Showing **{len(filtered):,}** of {len(df):,} claims")
 # ── Computed metrics ──────────────────────────────────────────
 total_claims    = len(filtered)
 total_paid      = filtered[filtered["claim_status"] == "paid"]["claim_amount"].sum()
-total_premiums  = pol["annual_premium"].sum()
+# Loss ratio = claims paid ÷ total premiums COLLECTED over the policy lifetime
+# (annual premium × years in force per policy) — apples-to-apples comparison
+total_premiums  = (pol["annual_premium"] * pol["years_in_force"].clip(lower=1)).sum()
 loss_ratio      = total_paid / total_premiums if total_premiums > 0 else 0
 avg_processing  = filtered["days_to_decision"].dropna().mean()
 

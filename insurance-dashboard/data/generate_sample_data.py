@@ -116,9 +116,11 @@ policies["age_at_issue"] = (
 ).astype(int)
 policies["age_band"] = policies["age_at_issue"].apply(age_band)
 
-# Premium: roughly 0.5-1.5% of face value per year, higher for older/smoker
-base_rate = np.random.uniform(0.005, 0.015, n_p)
-smoker_mult = np.where(policies["smoker"], 1.3, 1.0)
+# Premium: 4-8% of face value per year (produces a realistic loss ratio 0.55–0.80)
+# Real premiums vary widely; this range is intentionally set to balance the
+# ~30-40 paid claims in the sample data against total premium income.
+base_rate = np.random.uniform(0.04, 0.08, n_p)
+smoker_mult = np.where(policies["smoker"], 1.35, 1.0)
 policies["annual_premium"] = (policies["face_value"] * base_rate * smoker_mult).round(0)
 policies["years_in_force"] = (
     (today - pd.to_datetime(policies["issue_date"])).dt.days / 365.25
@@ -133,8 +135,8 @@ n_c = 130
 claim_policies = random.choices(range(1, n_p + 1), k=n_c)
 
 statuses = random.choices(
-    ["paid", "paid", "paid", "approved", "under_review", "pending", "denied"],
-    weights=[30, 30, 20, 15, 15, 10, 10], k=n_c
+    ["paid", "approved", "under_review", "pending", "denied"],
+    weights=[25, 12, 20, 18, 10], k=n_c
 )
 
 filed_dates = [rand_date(date(2018, 1, 1), date(2024, 11, 1)) for _ in range(n_c)]

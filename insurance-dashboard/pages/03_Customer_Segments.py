@@ -98,8 +98,9 @@ st.info(
 )
 
 paid_matrix = (
-    df[df["claim_status"] == "paid"]
-    [df["age_band"].notna() & df["tenure_tier"].notna()]
+    df[(df["claim_status"] == "paid") &
+       df["age_band"].notna() &
+       df["tenure_tier"].notna()]
     .groupby(["age_band","tenure_tier"])["claim_amount"].sum()
     .reset_index().rename(columns={"claim_amount":"claims_paid"})
 )

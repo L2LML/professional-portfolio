@@ -33,7 +33,8 @@ c1, c2, c3, c4 = st.columns(4)
 c1.metric("Total Paid",       f"${paid['claim_amount'].sum()/1e6:.2f}M")
 c2.metric("Avg Claim (Paid)", f"${paid['claim_amount'].mean():,.0f}")
 c3.metric("Largest Claim",    f"${df['claim_amount'].max():,.0f}")
-c4.metric("Annual Premiums",  f"${pol['annual_premium'].sum()/1e6:.2f}M")
+pol["total_collected"] = pol["annual_premium"] * pol["years_in_force"].clip(lower=1)
+c4.metric("Total Premiums Collected",  f"${pol['total_collected'].sum()/1e6:.2f}M")
 st.divider()
 
 left, right = st.columns(2)
@@ -66,7 +67,7 @@ with right:
         "🟢 Green = the product generates more in premiums than it pays in claims. "
         "🔴 Red = claims are exceeding premiums collected — the product is losing money."
     )
-    rev = pol.groupby("policy_type")["annual_premium"].sum().reset_index()
+    rev = pol.groupby("policy_type")["total_collected"].sum().reset_index()
     exp = df[df["claim_status"]=="paid"].groupby("policy_type")["claim_amount"].sum().reset_index()
     combined = rev.merge(exp, on="policy_type", how="outer").fillna(0)
     combined.columns = ["Policy Type","Premiums","Claims Paid"]
@@ -156,9 +157,11 @@ paid_by_type = (
     .groupby("policy_type")["claim_amount"].sum()
     .reset_index().rename(columns={"claim_amount":"paid"})
 )
+# Total premiums collected = annual premium × years in force per policy
+pol["total_collected"] = pol["annual_premium"] * pol["years_in_force"].clip(lower=1)
 prem_by_type = (
-    pol.groupby("policy_type")["annual_premium"].sum()
-    .reset_index().rename(columns={"annual_premium":"premiums"})
+    pol.groupby("policy_type")["total_collected"].sum()
+    .reset_index().rename(columns={"total_collected":"premiums"})
 )
 lr_df = prem_by_type.merge(paid_by_type, on="policy_type", how="left").fillna(0)
 lr_df["loss_ratio"] = (lr_df["paid"] / lr_df["premiums"].replace(0, float("nan"))).round(3)
@@ -207,6 +210,6 @@ fig_lr.update_layout(
 st.plotly_chart(fig_lr, use_container_width=True)
 
 # Summary callout
-overall_lr = df[df["claim_status"]=="paid"]["claim_amount"].sum() / max(pol["annual_premium"].sum(), 1)
+overall_lr = df[df["claim_status"]=="paid"]["claim_amount"].sum() / max(pol["total_collected"].sum(), 1)
 zone_label = "🟢 Healthy" if overall_lr < 0.70 else ("🟡 Watch Zone" if overall_lr < 0.85 else "🔴 High Risk")
 st.metric("Overall Portfolio Loss Ratio", f"{overall_lr:.2f}", zone_label, delta_color="off")

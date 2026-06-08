@@ -85,36 +85,49 @@ with right:
         "claims per policy (e.g. several beneficiaries filing on the same policy). "
         "🟢 Green = low (fewer claims per policy) · 🔴 Red = high (more claims per policy)."
     )
-    max_ratio = agents["claims_per_policy"].max()
-    fig2 = px.scatter(
-        agents, x="policies", y="total_claims",
-        size="premium_revenue", color="claims_per_policy",
-        hover_name="agent_name",
-        hover_data={
-            "claims_per_policy": ":.2f",
-            "premium_revenue":   ":$,.0f",
-            "policies":          True,
-            "total_claims":      True,
-        },
-        color_continuous_scale=RISK_SCALE,
-        range_color=[0, max(max_ratio, 1.0)],
-        labels={
-            "policies":         "Policies Written",
-            "total_claims":     "Claims Filed",
-            "claims_per_policy":"Claims per Policy",
-            "premium_revenue":  "Annual Premium",
-        },
-        size_max=40,
+    # Binary color: GREEN = under 1 claim per policy (healthy), RED = over 1 (high exposure)
+    agents["dot_color"] = agents["claims_per_policy"].apply(
+        lambda v: GREEN if v < 1.0 else RED
     )
+    agents["health_label"] = agents["claims_per_policy"].apply(
+        lambda v: "Healthy (< 1 claim/policy)" if v < 1.0 else "High Exposure (≥ 1 claim/policy)"
+    )
+
+    fig2 = go.Figure()
+    for label, color in [("Healthy (< 1 claim/policy)", GREEN),
+                          ("High Exposure (≥ 1 claim/policy)", RED)]:
+        subset = agents[agents["health_label"] == label]
+        if subset.empty:
+            continue
+        fig2.add_trace(go.Scatter(
+            x=subset["policies"],
+            y=subset["total_claims"],
+            mode="markers+text",
+            name=label,
+            marker=dict(
+                size=(subset["premium_revenue"] / subset["premium_revenue"].max() * 40 + 10).tolist(),
+                color=color,
+                opacity=0.85,
+                line=dict(color="white", width=1.5),
+            ),
+            text=subset["agent_name"].str.split().str[-1],
+            textposition="top center",
+            customdata=subset[["claims_per_policy","premium_revenue"]].values,
+            hovertemplate=(
+                "<b>%{text}</b><br>"
+                "Policies Written: %{x}<br>"
+                "Claims Filed: %{y}<br>"
+                "Claims per Policy: %{customdata[0]:.2f}<br>"
+                "Annual Premium: $%{customdata[1]:,.0f}<extra></extra>"
+            ),
+        ))
+
     fig2.update_layout(
         height=340,
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(gridcolor="#E2E8F0"),
-        yaxis=dict(gridcolor="#E2E8F0"),
-        coloraxis_colorbar=dict(
-            title="Claims / Policy",
-            tickformat=".1f",
-        ),
+        xaxis=dict(gridcolor=GRID, title="Policies Written"),
+        yaxis=dict(gridcolor=GRID, title="Claims Filed"),
+        legend=dict(orientation="h", y=1.12, title=""),
     )
     st.plotly_chart(fig2, use_container_width=True)
 
