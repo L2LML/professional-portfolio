@@ -163,9 +163,13 @@ with right:
         fig2.add_vline(
             x=3.5,
             line_dash="dash", line_color=RED, line_width=2,
-            annotation_text="← Within SLA  |  SLA Breached →",
-            annotation_font_color=RED,
-            annotation_position="top center",
+        )
+        fig2.add_annotation(
+            x=3.5, y=1.05, xref="x", yref="paper",
+            text="← Within SLA  |  Breached →",
+            showarrow=False,
+            font=dict(color=RED, size=11),
+            xanchor="center",
         )
         fig2.update_layout(
             height=340,

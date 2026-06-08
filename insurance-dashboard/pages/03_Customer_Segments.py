@@ -27,31 +27,48 @@ ph  = load_policyholders()
 AGE_ORDER    = ["18–35 Young Adult","36–50 Middle Age","51–65 Pre-Retirement","65+ Senior"]
 TENURE_ORDER = ["New (0–2 yrs)","Establishing (3–5 yrs)","Loyal (6–10 yrs)","Long-Term (11+ yrs)"]
 
-# ── Age Band Analysis ─────────────────────────────────────────
-st.subheader("Policy Count & Claim Rate by Age Band")
-age_pol    = pol.groupby("age_band").size().reset_index(name="policies")
-age_claims = df.groupby("age_band").size().reset_index(name="claims")
-age_df = age_pol.merge(age_claims, on="age_band", how="left").fillna(0)
-age_df["claim_rate"] = (age_df["claims"] / age_df["policies"] * 100).round(1)
+# ── Age Band — Average Claim vs Average Premium ───────────────
+st.subheader("Average Claim Size vs Annual Premium by Age Band")
+st.caption(
+    "**Average Claim Size** = the typical payout when a claim is filed for this age group. "
+    "**Average Annual Premium** = what a typical policy costs per year for this age group. "
+    "Older policyholders typically carry higher face-value policies — and thus larger claims. "
+    "🟢 Green = premiums. 🔴 Red = average claim."
+)
+
+age_prem = (
+    pol[pol["age_band"].notna()]
+    .groupby("age_band")["annual_premium"].mean()
+    .reset_index().rename(columns={"annual_premium":"avg_premium"})
+)
+age_claim = (
+    df[df["age_band"].notna() & (df["claim_status"]=="paid")]
+    .groupby("age_band")["claim_amount"].mean()
+    .reset_index().rename(columns={"claim_amount":"avg_claim"})
+)
+age_df = age_prem.merge(age_claim, on="age_band", how="left").fillna(0)
 age_df = age_df[age_df["age_band"].isin(AGE_ORDER)]
 age_df["age_band"] = pd.Categorical(age_df["age_band"], categories=AGE_ORDER, ordered=True)
 age_df = age_df.sort_values("age_band")
 
 fig1 = go.Figure()
-fig1.add_trace(go.Bar(name="Policies", x=age_df["age_band"], y=age_df["policies"],
-                      marker_color=NAVY, yaxis="y1"))
-fig1.add_trace(go.Bar(name="Claims",   x=age_df["age_band"], y=age_df["claims"],
-                      marker_color=BLUE, yaxis="y1"))
-fig1.add_trace(go.Scatter(name="Claim Rate %", x=age_df["age_band"], y=age_df["claim_rate"],
-                           mode="lines+markers+text", text=[f"{v:.0f}%" for v in age_df["claim_rate"]],
-                           textposition="top center", line=dict(color=RED, width=2.5),
-                           marker=dict(size=8), yaxis="y2"))
+fig1.add_trace(go.Bar(
+    name="Avg Annual Premium", x=age_df["age_band"], y=age_df["avg_premium"],
+    marker_color=GREEN,
+    text=[f"${v:,.0f}" for v in age_df["avg_premium"]],
+    textposition="outside",
+))
+fig1.add_trace(go.Bar(
+    name="Avg Claim When Filed", x=age_df["age_band"], y=age_df["avg_claim"],
+    marker_color=RED, opacity=0.85,
+    text=[f"${v:,.0f}" for v in age_df["avg_claim"]],
+    textposition="outside",
+))
 fig1.update_layout(
     barmode="group", height=340,
-    yaxis=dict(title="Count", gridcolor="#E2E8F0"),
-    yaxis2=dict(title="Claim Rate %", overlaying="y", side="right", range=[0, 80], showgrid=False),
+    yaxis=dict(title="Amount ($)", gridcolor=GRID, tickformat="$,.0f"),
     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    legend=dict(orientation="h", y=1.1), xaxis=dict(showgrid=False),
+    legend=dict(orientation="h", y=1.12), xaxis=dict(showgrid=False),
 )
 st.plotly_chart(fig1, use_container_width=True)
 

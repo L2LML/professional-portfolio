@@ -49,31 +49,44 @@ left, right = st.columns(2)
 
 # ── Payout by policy type ─────────────────────────────────────
 with left:
-    st.subheader("Total Payouts by Policy Type")
+    st.subheader("Total Paid Out by Policy Type")
+    st.caption("How much the company has paid to beneficiaries, broken down by product. "
+               "Colors match the product palette used throughout the dashboard.")
     by_type = (
         paid.groupby("policy_type")["claim_amount"]
         .sum().reset_index().sort_values("claim_amount")
     )
+    # Smart formatter: M for millions, K for thousands
+    def fmt_dollars(v):
+        if v >= 1_000_000: return f"${v/1_000_000:.2f}M"
+        if v >= 1_000:     return f"${v/1_000:,.0f}K"
+        return f"${v:,.0f}"
+
     fig1 = go.Figure(go.Bar(
-        x=by_type["claim_amount"] / 1000,
+        x=by_type["claim_amount"],
         y=by_type["policy_type"],
         orientation="h",
         marker_color=[PRODUCT_COLORS.get(t, NAVY) for t in by_type["policy_type"]],
-        text=[f"${v/1000:,.0f}K" for v in by_type["claim_amount"]],
+        text=[fmt_dollars(v) for v in by_type["claim_amount"]],
         textposition="outside",
     ))
-    fig1.update_layout(height=300, xaxis_title="Total Paid ($K)",
-                       paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                       xaxis=dict(showgrid=False), yaxis=dict(showgrid=False))
+    fig1.update_layout(
+        height=300,
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(showgrid=False, title="Total Paid Out ($)",
+                   tickformat="$,.0f"),
+        yaxis=dict(showgrid=False),
+    )
     st.plotly_chart(fig1, use_container_width=True)
 
 # ── Loss Ratio by Product ─────────────────────────────────────
 with right:
     st.subheader("Loss Ratio by Product")
     st.caption(
-        "**Loss Ratio** = Claims Paid ÷ Premiums Collected. "
-        "🟢 Below 0.70 = healthy. 🟡 0.70–0.85 = watch zone. 🔴 Above 0.85 = high risk. "
-        "Dashed line = industry benchmark. Each product tells a different story."
+        "**Loss Ratio** = Claims Paid ÷ Premiums Collected over policy lifetime. "
+        "🟢 Below 0.70 = healthy (company keeps 30¢+ per premium dollar). "
+        "🟡 0.70–0.85 = watch zone. 🔴 Above 0.85 = high risk. "
+        "Dashed line = industry benchmark at 0.70."
     )
     rev2  = pol.groupby("policy_type")["total_collected"].sum()
     exp2  = df[df["claim_status"]=="paid"].groupby("policy_type")["claim_amount"].sum()
@@ -83,20 +96,26 @@ with right:
     lr_rt["color"] = lr_rt["Loss Ratio"].apply(
         lambda r: GREEN if r < 0.70 else (AMBER if r < 0.85 else RED)
     )
+    lr_rt["zone"] = lr_rt["Loss Ratio"].apply(
+        lambda r: "🟢 Healthy" if r < 0.70 else ("🟡 Watch" if r < 0.85 else "🔴 High Risk")
+    )
 
+    max_lr = max(lr_rt["Loss Ratio"].max() * 1.4, 1.0)
     fig2 = go.Figure(go.Bar(
         x=lr_rt["Loss Ratio"],
         y=lr_rt["Policy Type"],
         orientation="h",
         marker_color=lr_rt["color"].tolist(),
-        text=[f"{v:.2f}" for v in lr_rt["Loss Ratio"]],
+        text=[f"{row['Loss Ratio']:.2f}  {row['zone']}" for _, row in lr_rt.iterrows()],
         textposition="outside",
     ))
     fig2.add_vline(x=0.70, line_dash="dash", line_color=AMBER, line_width=2,
-                  annotation_text="Benchmark 0.70", annotation_font_color=AMBER)
+                   annotation_text="0.70 Benchmark",
+                   annotation_position="top right",
+                   annotation_font_color=AMBER)
     fig2.update_layout(
         height=300,
-        xaxis=dict(title="Loss Ratio", range=[0, 1.2], showgrid=False),
+        xaxis=dict(title="Loss Ratio", range=[0, max_lr], showgrid=False),
         yaxis=dict(showgrid=False),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
     )
