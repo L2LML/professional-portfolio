@@ -1,0 +1,50 @@
+using System;
+
+namespace TechElevator.GuessTheNumber
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // The Program's secret number that the player has to guess
+            Random randomizer = new Random();
+            int secretNumber = randomizer.Next(1, 100);
+            int guess = 0;
+
+            // Loop until the player guesses the number
+            while (guess != secretNumber)
+            {
+                // Let the player enter a number
+                Console.WriteLine("Guess a number between 1 and 100");
+                string guessText = Console.ReadLine();
+
+                Console.WriteLine();
+                Console.WriteLine("You guessed: " + guessText);
+                Console.WriteLine();
+
+                guess = int.Parse(guessText);
+
+                // Evaluate the player'd guess and respond
+                if (guess == secretNumber)
+                {
+                    Console.WriteLine("Congratulations!! You guessed the secret number!!");
+                    Console.WriteLine();
+                    Console.WriteLine("The application will now close.");
+
+                }
+                else if (guess > secretNumber)
+                {
+                    Console.WriteLine("Nope! The secret number is LOWER than your guess.");
+                }
+                else
+                {
+                    Console.WriteLine("Nope! The secret number is GREATER than your guess.");
+                }
+
+                Console.WriteLine();
+            }
+
+            //After this line is reached, the program will end
+        }
+    }
+}

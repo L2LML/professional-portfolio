@@ -1,73 +1,80 @@
 # Professional Portfolio — Lisa Lewandowski
 
-A collection of professional case studies and project work demonstrating applied skills in process improvement, data analysis, and project management.
+A collection of professional case studies, software development projects, and applied work demonstrating skills in process improvement, full-stack development, data analysis, and project management.
 
 ---
 
-## 📊 Lean Six Sigma Black Belt Case Study
-**File:** `LSSBB_Portfolio_Lewandowski.pptx`
+## 📁 Projects
 
-### Overview
-This 11-slide presentation documents a **4-week Lean Six Sigma Black Belt validation project** completed through the **Siena Heights University Professional Development Center** (Southfield, MI) in Q2 2024.
+### 📊 Lean Six Sigma Black Belt Case Study
+**File:** [`LSSBB_Portfolio_Lewandowski.pptx`](./LSSBB_Portfolio_Lewandowski.pptx)
+**Folder:** [`/lssbb-portfolio`](./LSSBB_Portfolio_Lewandowski.pptx)
 
-The project was a **live client engagement** — not a classroom simulation. Real operational data from **TriCore Reference Laboratories** was collected, analyzed, and validated using full DMAIC methodology and statistical tools. The same tools and methods applied here are directly transferable to any operations or process improvement role.
+A **4-week live client engagement** completed through Siena Heights University PDC (Q2 2024). Real operational data from TriCore Reference Laboratories was collected, analyzed, and validated using full DMAIC methodology and statistical tools.
 
----
-
-### The Client
-**TriCore Reference Laboratories** — Albuquerque, NM
-- Largest medical laboratory in New Mexico
-- Non-profit, ~$1.5B revenue, 2,200+ employees
-- 12 reference lab locations (blood draw operations)
-- Formed by merger of Presbyterian Healthcare Services, UNM Health Sciences Center, and The Reference Laboratory
-
----
-
-### The Problem
-TriCore's 12 labs were conducting **141,708 blood draws per year** — but peak performance data showed a potential of **188,928**. Daily throughput varied from as low as 33 draws to 54 at the top-performing lab (Lab 5), a gap of 21 draws per day per lab.
-
-- **Cost of Poor Quality (COPQ): $5–6 Million**
-- Risks included loss of federal Hill Burton Act funding ($5–8M/year), malpractice exposure, overtime costs, and delayed patient care
-- Root cause: inconsistent processes across labs — Lab 5 outperformed all others but no standard had been set
+| | |
+|---|---|
+| **Client** | TriCore Reference Laboratories — 12 labs, ~$1.5B non-profit, Albuquerque NM |
+| **Problem** | 141,708 blood draws/year vs. 188,928 potential — $5–6M Cost of Poor Quality |
+| **Method** | Full DMAIC · Two-sample T-test · Minitab · C&E Matrix · FMEA · Lean Waste Analysis |
+| **Results** | Mean processing time reduced 25–31% across all 3 pilot labs |
+| **Impact** | **$894,600+** minimum annual revenue recovery · Sigma: 2.6 → 2.9 |
+| **Skills** | Project Management · Lean Six Sigma · Statistical Analysis · Process Improvement · Change Management |
 
 ---
 
-### Methodology — DMAIC
-| Phase | Key Activities |
-|-------|---------------|
-| **Define** | Project charter, Voice of Customer, problem statement, COPQ analysis |
-| **Measure** | 180+ data points collected across 12 labs, Gage R&R, baseline sigma level |
-| **Analyze** | 4 lab process types identified, C&E matrix, FMEA, Lean waste analysis, null hypothesis |
-| **Improve** | 3-lab pilot experiment, two-sample T-test, 95% confidence interval, Minitab analysis |
-| **Control** | Standardized Work Instructions (SWI), 5S, Visual Management, company-wide rollout |
+### 📈 Virtual Stock Market
+**Folder:** [`/virtual-stock-market`](./virtual-stock-market)
+
+A real-time stock trading simulation game (Market 25) where users can buy and sell stocks using current market data within customized time intervals.
+
+| | |
+|---|---|
+| **Type** | Team Capstone Project — Tech Elevator Full-Stack Development Bootcamp |
+| **Stack** | Java · Spring Boot · Vue.js · PostgreSQL · REST API |
+| **Method** | Agile/Scrum · Full-stack architecture · API integration |
+| **Skills** | Full-Stack Development · Team Collaboration · Agile · Database Design · REST APIs |
 
 ---
 
-### Results
+### 🎮 Guess the Number
+**Folder:** [`/guess-the-number`](./guess-the-number)
 
-| Metric | Result |
-|--------|--------|
-| Pilot lab mean processing time (Lab 4) | 30.6 min → **21.1 min** (31% faster) |
-| Pilot lab mean processing time (Lab 8) | 27.8 min → **20.9 min** (25% faster) |
-| Pilot lab mean processing time (Lab 9) | 30.6 min → **21.1 min** (31% faster) |
-| Statistical significance | ✅ All 3 labs — null hypothesis rejected at 95% CI |
-| Annual revenue recovery (minimum) | **+$894,600** |
-| Additional draws/year across all labs | **+17,892** |
-| Sigma level improvement | **2.6 → 2.9** (stretch goal: 3.2) |
+A command-line number guessing game built with comprehensive unit testing demonstrating test-driven development (TDD) practices.
 
----
-
-### Skills Demonstrated
-- **Project Management** — Charter, milestone planning, stakeholder management
-- **Lean Six Sigma (DMAIC)** — SWI, 5S, VSM, C&E Matrix, FMEA, Gage R&R
-- **Statistical Analysis** — Two-sample T-test, Minitab, hypothesis testing, confidence intervals
-- **Process Improvement** — NVA analysis, swim lane mapping, waste elimination (7 wastes)
-- **Change Management** — Training, SOP development, company-wide rollout planning
+| | |
+|---|---|
+| **Type** | Solo Project — Tech Elevator Module 1 |
+| **Stack** | C# · .NET · xUnit |
+| **Highlight** | 96% test coverage |
+| **Skills** | Test-Driven Development · Object-Oriented Programming · Unit Testing |
 
 ---
 
-### Credentials
-Blackbelt Validation Project — Siena Heights University Professional Development Center
-MBB Senseis: Dr. Ben Benson (PhD, MBB, PMP) & Mr. Phil White (MBB)
+### 🏠 Tax Assessor Document Skill
+**Folder:** [`/tax-assessor-docs`](./tax-assessor-docs)
 
-> *"The tools and methods applied in this engagement are the same ones I bring to every organization I work with."*
+A Claude AI skill for scanning, organizing, and logging property tax assessment appeal documents into a structured tracker for administrative and legal filing purposes.
+
+| | |
+|---|---|
+| **Type** | AI Automation · Document Processing |
+| **Stack** | Claude AI · Prompt Engineering · Excel Integration |
+| **Skills** | AI Tool Development · Process Automation · Document Management |
+
+---
+
+## 🛠 Skills Summary
+
+| Category | Skills |
+|----------|--------|
+| **Process Improvement** | Lean Six Sigma (DMAIC), FMEA, C&E Matrix, 5S, VSM, SWI, Gage R&R |
+| **Statistical Analysis** | Minitab, T-Test, Hypothesis Testing, Confidence Intervals |
+| **Project Management** | Charter, Stakeholder Management, Milestone Planning, Change Management |
+| **Full-Stack Development** | Java, Spring Boot, Vue.js, PostgreSQL, REST APIs, C#, .NET |
+| **Testing** | TDD, xUnit, Unit Testing (96% coverage) |
+| **AI & Automation** | Claude AI, Prompt Engineering, Document Processing |
+
+---
+
+*Lisa Lewandowski · [GitHub: L2LML](https://github.com/L2LML)*
