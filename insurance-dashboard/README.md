@@ -1,104 +1,189 @@
-# Insurance Claims BI Dashboard
+# 📊 Insurance Claims BI Dashboard
 
-An interactive business intelligence dashboard built with Streamlit and Plotly, visualizing life insurance claims operations data. The third tier in the insurance data portfolio — SQL → ETL Pipeline → Dashboard.
+An interactive, multi-page business intelligence dashboard for life insurance claims operations. Built with Python, Streamlit, and Plotly — the third tier of a full data engineering portfolio that starts with a PostgreSQL database and a Python ETL pipeline.
+
+> ⚠️ **Demo dashboard — all data is synthetically generated.** No real policyholders, claims, or financial figures are shown. In production this connects directly to the Life Insurance Claims PostgreSQL database via the Python ETL pipeline (both included in this portfolio).
 
 ---
 
-## Live Dashboard
+## 🚀 View the Live Dashboard
 
-> **Run locally in 60 seconds — no database required.**
-> Pre-generated sample data is included in the repo.
+> **Deploy URL coming soon** — see [How to Deploy](#how-to-deploy) below.
+
+---
+
+## 📥 Run It Locally (60 seconds, no database needed)
+
+Pre-built sample data is included in the repo — no setup required.
 
 ```bash
+# 1. Clone the portfolio repo
+git clone https://github.com/L2LML/professional-portfolio.git
+cd professional-portfolio/insurance-dashboard
+
+# 2. Install dependencies
 pip install -r requirements.txt
+
+# 3. Launch
 streamlit run app.py
 ```
 
+Open your browser to **http://localhost:8501**
+
 ---
 
-## Dashboard Pages
+## 📋 Dashboard Pages
 
 ### 🏦 Executive Summary (`app.py`)
-- KPI cards: total claims, total paid out, denial rate, avg decision time, open claims
-- Claims by status — donut chart
-- Monthly claims volume — trend line
-- Open high-value claims table (>$250K) with aging flags
+The landing page. Shows the health of the entire claims operation at a glance.
+
+| What you see | What it tells you |
+|---|---|
+| **5 KPI cards with trend arrows** | Total claims, Loss Ratio, Total Paid Out, Avg Decision Time, Pending Reserve — each compared to the prior year (🟢 improving / 🔴 worsening) |
+| **Claims by Status donut** | Where every claim sits in the lifecycle — pending → under review → approved → paid → denied |
+| **Year-over-Year trend** | Current year claim volume (navy bars) vs prior year (gray) by month |
+| **Open High-Value Claims table** | Claims over $250,000 still unresolved — the company's biggest financial exposure right now |
+
+---
 
 ### 📋 Claims Operations
-- Open claims by aging status (On Track / Aging / Overdue)
-- Examiner workload — claims count + average days open per examiner
-- Claims distribution by cause of death with denial rate overlay
-- Full open claims detail table
+Day-to-day claims management view for operations managers.
+
+| What you see | What it tells you |
+|---|---|
+| **Open Claims Aging by Policy Type** | Stacked bars showing On Track / At Risk / Overdue — colored by policy type so you see *what kind* of claims are delayed |
+| **Examiner Workload by Policy Type** | Which examiners have which product types in their queue — identifies overloaded staff |
+| **Claims by Cause of Death** | Bar height = total claims. Color = denial rate zone (🟢 low / 🔴 high). Which causes get denied most often? |
+| **Open Claims Detail table** | Every open claim with days open, aging flag, and examiner |
+| **Examiner Decision Consistency** | Scatter plot: approval rate vs. avg days. Team average lines flag examiners who are inconsistent or slow |
+
+---
 
 ### 💰 Financial Analysis
-- Total payouts by policy type
-- Annual premium revenue vs. claim exposure by product line
-- Cumulative payout running total over time
-- Denial rate analysis and reason breakdown
+Profitability and exposure — for finance and actuarial teams.
+
+| What you see | What it tells you |
+|---|---|
+| **Total Paid Out by Product** | Which products have generated the most claims payments, in actual dollar amounts |
+| **Loss Ratio by Product** | 🟢/🟡/🔴 colored bars showing claims paid ÷ premiums collected per product. Dashed line = industry benchmark (0.70). |
+| **Cumulative Payouts Over Time** | Running total of all claims disbursements since 2018 |
+| **Unit Economics by Product** | Green = avg annual premium. Red = avg claim when filed. The gap shows which products have the best revenue relationship. |
+| **Denial Analysis** | Overall denial rate, denied dollar value, and reasons table |
+
+---
 
 ### 👥 Customer Segments
-- Policy count and claim rate by age band at issuance (18–35 / 36–50 / 51–65 / 65+)
-- Premium revenue vs. claim exposure by customer tenure tier
-- **Age × Tenure Profitability Matrix** — heatmap showing premium-to-claim ratio by segment
+Actuarial and pricing intelligence — which customers are most profitable?
+
+| What you see | What it tells you |
+|---|---|
+| **Avg Claim vs Avg Premium by Age Band** | Older policyholders typically carry higher-value coverage — and generate larger claims. Shows the revenue relationship per age group. |
+| **Premium vs Claim Exposure by Tenure** | Long-term customers: are they generating more premiums than claims? |
+| **Age × Tenure Profitability Matrix** | Each cell = Loss Ratio for that customer segment. 🟢 Green = profitable. 🔴 Red = losing money. Immediately shows which segments need pricing review. |
+
+---
 
 ### 🏅 Agent Performance
-- Premium revenue leaderboard (horizontal bar)
-- Policies written vs. claims filed scatter plot (bubble size = premium revenue)
-- Full agent leaderboard table with conditional formatting
+Distribution management — who is building the best book of business?
+
+| What you see | What it tells you |
+|---|---|
+| **Premium Revenue by Agent — by Product** | Stacked bars show each agent's total revenue and what they're selling (Term Life, Whole Life, Universal Life, Variable Life) |
+| **Policies Written vs Claims Filed** | Bubble size = premium revenue. Color = dominant claim type. Identifies high-volume agents and their claims exposure. |
+| **Agent Portfolio Mix** | Which products does each agent specialize in? Agents with more permanent products deliver higher long-term value. |
+| **Revenue Efficiency** | Annual premium per policy written — who is selling higher-value coverage? |
 
 ---
 
-## Architecture
+### ⚖️ SLA & Compliance
+Regulatory tracking — the page a compliance officer opens every morning.
+
+| What you see | What it tells you |
+|---|---|
+| **5 SLA KPI cards** | Decision SLA compliance %, claims within 45-day rule, acknowledge breaches, at-risk claims, pending reserve |
+| **Open Claims by SLA Status and Product** | Which products are overdue, at risk, or on track. Tells you *what kind* of claims are in trouble. |
+| **Decision Time Distribution** | How many claims were decided in 0–10 days, 11–20, 21–30 (green), 31–45 (amber), 46+ (red). Count and % on each bar. |
+| **Urgent Claims table** | Every claim past or approaching the 45-day SLA deadline — with color-coded days open |
+| **Pending Reserve by Product** | Donut showing reserve allocation by product type + table with exact dollar figures |
+
+---
+
+## 🗄️ How to Deploy (Streamlit Community Cloud — Free)
+
+Anyone with a GitHub account can deploy this for free in about 3 minutes.
+
+### Step 1 — Go to Streamlit Cloud
+Visit **[share.streamlit.io](https://share.streamlit.io)** and sign in with GitHub.
+
+### Step 2 — Create a New App
+Click **"Create app"** and fill in:
+
+| Field | Value |
+|---|---|
+| **Repository** | `L2LML/professional-portfolio` |
+| **Branch** | `main` |
+| **Main file path** | `insurance-dashboard/app.py` |
+| **App URL** | Choose a custom name (e.g. `lisa-insurance-dashboard`) |
+
+### Step 3 — Deploy
+Click **"Deploy!"** — Streamlit Cloud installs dependencies automatically from `requirements.txt` and launches the app. Takes about 2 minutes.
+
+Your dashboard will be live at:
+```
+https://lisa-insurance-dashboard.streamlit.app
+```
+
+Share that URL with anyone — no login, no install, opens instantly in any browser.
+
+---
+
+## 🔗 How This Fits the Portfolio
+
+This dashboard is the **third tier** of a complete data engineering stack:
 
 ```
-life-insurance-claims-db/     ← PostgreSQL schema + SQL queries
-        ↓
-insurance-cloud-migration/    ← Python ETL — Extract, Transform, Validate, Load
-        ↓
-insurance-dashboard/          ← THIS PROJECT — Streamlit + Plotly BI layer
-    data/sample/*.parquet     ← Pre-generated sample data (works standalone)
+1. 🗄️  Life Insurance Claims Database
+        PostgreSQL · 9 tables · 24 SQL queries · window functions
+        Triggers · stored procedures · age/tenure segmentation
+        → ../life-insurance-claims-db/
+
+2. ☁️  Insurance Claims Cloud Migration Pipeline
+        Python ETL: Extract → Transform → Validate → Load
+        pandas · SQLAlchemy · pyarrow · boto3 (AWS S3)
+        → ../insurance-cloud-migration/
+
+3. 📊  THIS DASHBOARD
+        Streamlit · Plotly · 5 pages · central color system
+        Loss ratio · SLA compliance · trend arrows · sample data
 ```
 
----
-
-## Files
-
-| File | Purpose |
-|------|---------|
-| `app.py` | Executive Summary — main entry point |
-| `pages/01_Claims_Operations.py` | Claims aging, examiner workload, cause analysis |
-| `pages/02_Financial_Analysis.py` | Payouts, revenue vs. exposure, running totals |
-| `pages/03_Customer_Segments.py` | Age band, tenure cohort, profitability matrix heatmap |
-| `pages/04_Agent_Performance.py` | Agent leaderboard and scatter analysis |
-| `data/load_data.py` | Cached data loader — reads Parquet files |
-| `data/generate_sample_data.py` | Re-generate sample data if needed |
-| `data/sample/*.parquet` | Pre-built sample data (130 claims, 35 policies) |
-| `.streamlit/config.toml` | Dashboard theme — navy/blue professional palette |
+The same data that was modeled in SQL, validated in the ETL pipeline, and loaded to S3 as Parquet is what powers this dashboard.
 
 ---
 
-## Technologies
+## 🛠️ Tech Stack
 
-| Library | Purpose |
-|---------|---------|
-| `streamlit` | Dashboard framework — pages, sidebar, metrics, layout |
-| `plotly` | Interactive charts — bar, line, scatter, pie, heatmap |
+| Tool | Purpose |
+|---|---|
+| `streamlit` | Multi-page dashboard framework |
+| `plotly` | Interactive charts — bar, scatter, pie, heatmap, line |
 | `pandas` | Data loading, filtering, aggregation |
 | `pyarrow` | Parquet file reading |
+| `matplotlib` | Required for pandas Styler gradient formatting |
 
 ---
 
 ## Skills Demonstrated
 
-| Skill | Detail |
-|-------|--------|
-| **Streamlit** | Multi-page app, sidebar filters, metrics, `st.cache_data` |
-| **Plotly** | Bar, line, scatter, donut, heatmap — all interactive |
-| **Data Visualization** | Business-focused chart design for insurance operations |
-| **Dashboard Design** | KPI cards, filter-driven views, conditional formatting |
-| **pandas** | GroupBy, merge, pivot, aggregation |
-| **Data Storytelling** | Each page tells a clear operational or financial story |
+| Category | Detail |
+|---|---|
+| **Dashboard Design** | 5-page multi-view app, central color system, consistent semantic colors |
+| **Data Visualization** | 20+ chart types — each answers a specific business question |
+| **Insurance Domain** | Loss ratio, SLA compliance, claims adjudication, reserve estimation |
+| **Python** | Modular page architecture, shared color/data modules, `@st.cache_data` |
+| **Business Intelligence** | KPI trend arrows, YoY comparison, actionable alerts |
+| **UX** | Plain-English explanations on every metric — readable by non-insurance audiences |
 
 ---
 
-*Lisa Lewandowski · [GitHub: L2LML](https://github.com/L2LML)*
+*Lisa Lewandowski · [GitHub: L2LML](https://github.com/L2LML) · [Full Portfolio](https://github.com/L2LML/professional-portfolio)*

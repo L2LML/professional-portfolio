@@ -26,15 +26,16 @@ A **4-week live client engagement** completed through Siena Heights University P
 ### 📊 Insurance Claims BI Dashboard
 **Folder:** [`/insurance-dashboard`](./insurance-dashboard)
 
-Interactive Streamlit dashboard visualizing the insurance claims data. Five pages covering operations, financials, customer segments, and agent performance. Pre-built sample data included — runs in 60 seconds with no database needed.
+Interactive, multi-page BI dashboard for life insurance claims operations. Covers Loss Ratio, SLA compliance, examiner workload, customer segment profitability, and agent performance. Pre-built sample data included — runs in 60 seconds locally or deploy free to Streamlit Cloud.
 
 | | |
 |---|---|
 | **Type** | Solo Project — Business Intelligence / Data Visualization |
 | **Stack** | Python · Streamlit · Plotly · pandas · pyarrow |
-| **Pages** | Executive Summary · Claims Operations · Financial Analysis · Customer Segments · Agent Performance |
-| **Highlight** | Age × Tenure profitability matrix heatmap · Live interactive filters |
-| **Skills** | Dashboard Design · Streamlit · Plotly · Data Storytelling · pandas |
+| **Pages** | Executive Summary · Claims Operations · Financial Analysis · Customer Segments · Agent Performance · SLA & Compliance |
+| **Key metrics** | Loss Ratio · SLA compliance · Pending reserve · YoY trend arrows · Age × Tenure profitability heatmap |
+| **Deploy** | Run locally: `streamlit run app.py` — or deploy free at [share.streamlit.io](https://share.streamlit.io) |
+| **Skills** | Dashboard Design · Streamlit · Plotly · Insurance Domain · Data Storytelling · pandas |
 
 ---
 
