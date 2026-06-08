@@ -25,15 +25,6 @@ agent_policies = (
          total_coverage=("face_value","sum"))
     .reset_index()
 )
-# Claim rate = % of policies that have had AT LEAST ONE claim filed
-# (unique policies with claims / total policies written by agent)
-policies_with_claims = (
-    df[["agent_name","policy_number"]]
-    .drop_duplicates()
-    .groupby("agent_name")
-    .size()
-    .reset_index(name="policies_with_claims")
-)
 agent_claims = (
     df.groupby("agent_name")
     .agg(total_claims=("claim_id","count"),
@@ -43,14 +34,16 @@ agent_claims = (
 )
 agents = (
     agent_policies
-    .merge(agent_claims,        on="agent_name", how="left")
-    .merge(policies_with_claims, on="agent_name", how="left")
+    .merge(agent_claims, on="agent_name", how="left")
     .fillna(0)
 )
-# Claim rate: % of policies that generated at least one claim (0–100%)
-agents["claim_rate_pct"] = (
-    agents["policies_with_claims"] / agents["policies"] * 100
-).round(1).clip(0, 100)
+# Claims per Policy: total claims filed / total policies written.
+# Reflects average claim volume per policy — can exceed 1.0 when multiple
+# beneficiaries file on the same policy.
+# Low = fewer claims per policy (healthier book); High = more exposure.
+agents["claims_per_policy"] = (
+    agents["total_claims"] / agents["policies"].replace(0, float("nan"))
+).round(2)
 agents["premium_to_claim"] = (
     agents["premium_revenue"] / agents["claim_exposure"].replace(0, float("nan"))
 ).round(2)
@@ -86,28 +79,33 @@ with left:
 with right:
     st.subheader("Policies Written vs Claims Filed")
     st.caption(
-        "**Claim Rate** = % of an agent's policies that have had at least one claim filed. "
-        "🟢 Green = low claim rate (fewer policies triggered claims) · "
-        "🔴 Red = high claim rate (more policies resulted in claims)."
+        "**Claims per Policy** = total claims filed ÷ total policies written. "
+        "A value of 0.5 means 1 claim per 2 policies. Values above 1.0 mean multiple "
+        "claims per policy (e.g. several beneficiaries filing on the same policy). "
+        "🟢 Green = low (fewer claims per policy) · 🔴 Red = high (more claims per policy)."
     )
+    max_ratio = agents["claims_per_policy"].max()
     fig2 = px.scatter(
         agents, x="policies", y="total_claims",
-        size="premium_revenue", color="claim_rate_pct",
+        size="premium_revenue", color="claims_per_policy",
         hover_name="agent_name",
-        hover_data={"claim_rate_pct": ":.1f",
-                    "premium_revenue": ":$,.0f",
-                    "policies": True},
+        hover_data={
+            "claims_per_policy": ":.2f",
+            "premium_revenue":   ":$,.0f",
+            "policies":          True,
+            "total_claims":      True,
+        },
         color_continuous_scale=[
-            [0.0,  "#047857"],   # 0%  — green (good)
-            [0.5,  "#FACC15"],   # 50% — yellow (watch)
-            [1.0,  "#DC2626"],   # 100% — red (high risk)
+            [0.0, "#047857"],   # low  — green (healthy)
+            [0.5, "#FACC15"],   # mid  — yellow (watch)
+            [1.0, "#DC2626"],   # high — red (high exposure)
         ],
-        range_color=[0, 100],
+        range_color=[0, max(max_ratio, 1.0)],
         labels={
-            "policies":      "Policies Written",
-            "total_claims":  "Claims Filed",
-            "claim_rate_pct":"Claim Rate %",
-            "premium_revenue":"Annual Premium",
+            "policies":         "Policies Written",
+            "total_claims":     "Claims Filed",
+            "claims_per_policy":"Claims per Policy",
+            "premium_revenue":  "Annual Premium",
         },
         size_max=40,
     )
@@ -117,9 +115,8 @@ with right:
         xaxis=dict(gridcolor="#E2E8F0"),
         yaxis=dict(gridcolor="#E2E8F0"),
         coloraxis_colorbar=dict(
-            title="Claim Rate %",
-            ticksuffix="%",
-            tickvals=[0, 25, 50, 75, 100],
+            title="Claims / Policy",
+            tickformat=".1f",
         ),
     )
     st.plotly_chart(fig2, use_container_width=True)
@@ -128,19 +125,19 @@ with right:
 st.subheader("Agent Leaderboard")
 display = agents[[
     "agent_name","agent_state","policies","premium_revenue",
-    "total_coverage","total_claims","claim_rate_pct","premium_to_claim"
+    "total_coverage","total_claims","claims_per_policy","premium_to_claim"
 ]].rename(columns={
     "agent_name":"Agent","agent_state":"State",
-    "policies":"Policies","premium_revenue":"Annual Premium",
-    "total_coverage":"Total Coverage","total_claims":"Claims",
-    "claim_rate_pct":"Claim Rate %","premium_to_claim":"Premium/Claim"
+    "policies":"Policies Written","premium_revenue":"Annual Premium",
+    "total_coverage":"Total Coverage","total_claims":"Total Claims",
+    "claims_per_policy":"Claims / Policy","premium_to_claim":"Premium/Claim Ratio"
 })
 st.dataframe(
     display.style.format({
-        "Annual Premium":"${:,.0f}",
-        "Total Coverage":"${:,.0f}",
-        "Claim Rate %":"{:.1f}%",
-        "Premium/Claim":"{:.2f}",
+        "Annual Premium":      "${:,.0f}",
+        "Total Coverage":      "${:,.0f}",
+        "Claims / Policy":     "{:.2f}",
+        "Premium/Claim Ratio": "{:.2f}",
     }),
     use_container_width=True, hide_index=True,
 )
