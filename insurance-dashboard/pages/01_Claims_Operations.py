@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.load_data import load_claims_fact
+from data.colors import AGING_COLORS, BLUE, NAVY, GRID, TEXT_MID, STATUS_COLORS
 
 st.set_page_config(page_title="Claims Operations", page_icon="📋", layout="wide")
 st.title("📋 Claims Operations")
@@ -33,7 +34,7 @@ with left:
     if not open_.empty:
         aging_counts = open_["aging_flag"].value_counts().reset_index()
         aging_counts.columns = ["Flag", "Count"]
-        COLOR = {"OVERDUE": "#DC2626", "AGING": "#D97706", "ON TRACK": "#047857"}
+        COLOR = AGING_COLORS
         fig = px.bar(aging_counts, x="Flag", y="Count",
                      color="Flag", color_discrete_map=COLOR,
                      text="Count")
@@ -56,7 +57,7 @@ with right:
     if not workload.empty:
         fig2 = go.Figure(go.Bar(
             x=workload["count"], y=workload["assigned_examiner"],
-            orientation="h", marker_color="#0284C7",
+            orientation="h", marker_color=BLUE,
             text=[f"{c} claims · {d:.0f} avg days" for c, d in
                   zip(workload["count"], workload["avg_days"])],
             textposition="outside",
@@ -77,9 +78,10 @@ cause = (
 )
 cause["denial_rate"] = (cause["denied"] / cause["total"] * 100).round(1)
 
+from data.colors import GREEN, AMBER, RED
 fig3 = px.bar(cause, x="cause_of_death", y="total",
               color="denial_rate",
-              color_continuous_scale=["#047857","#D97706","#DC2626"],
+              color_continuous_scale=[GREEN, AMBER, RED],
               labels={"cause_of_death":"Cause","total":"Claims","denial_rate":"Denial %"},
               text="total")
 fig3.update_traces(textposition="outside")

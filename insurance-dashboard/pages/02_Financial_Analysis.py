@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.load_data import load_claims_fact, load_policies
+from data.colors import PRODUCT_COLORS, NAVY, BLUE, GREEN, RED, AMBER, GRID
 
 st.set_page_config(page_title="Financial Analysis", page_icon="💰", layout="wide")
 st.title("💰 Financial Analysis")
@@ -42,7 +43,7 @@ with left:
         x=by_type["claim_amount"] / 1000,
         y=by_type["policy_type"],
         orientation="h",
-        marker_color=["#1E2761","#0284C7","#047857","#D97706","#7C3AED"][:len(by_type)],
+        marker_color=[PRODUCT_COLORS.get(t, NAVY) for t in by_type["policy_type"]],
         text=[f"${v/1000:,.0f}K" for v in by_type["claim_amount"]],
         textposition="outside",
     ))
@@ -61,9 +62,9 @@ with right:
 
     fig2 = go.Figure()
     fig2.add_trace(go.Bar(name="Premium Revenue", x=combined["Policy Type"],
-                          y=combined["Premium Revenue"]/1000, marker_color="#047857"))
+                          y=combined["Premium Revenue"]/1000, marker_color=GREEN))
     fig2.add_trace(go.Bar(name="Claim Exposure",  x=combined["Policy Type"],
-                          y=combined["Claim Exposure"]/1000,  marker_color="#DC2626", opacity=0.8))
+                          y=combined["Claim Exposure"]/1000,  marker_color=RED, opacity=0.8))
     fig2.update_layout(barmode="group", height=300, yaxis_title="Amount ($K)",
                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                        xaxis=dict(showgrid=False), yaxis=dict(gridcolor="#E2E8F0"),
@@ -84,7 +85,7 @@ fig3 = go.Figure()
 fig3.add_trace(go.Scatter(
     x=timeline["date_paid"], y=timeline["running_total"] / 1_000_000,
     fill="tozeroy", fillcolor="rgba(30,39,97,0.15)",
-    line=dict(color="#1E2761", width=2.5),
+    line=dict(color=NAVY, width=2.5),
     name="Cumulative Paid ($M)",
 ))
 fig3.update_layout(

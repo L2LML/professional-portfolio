@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.load_data import load_claims_fact, load_policies, load_policyholders
+from data.colors import NAVY, BLUE, GREEN, RED, AMBER, GRID, RISK_SCALE
 
 st.set_page_config(page_title="Customer Segments", page_icon="👥", layout="wide")
 st.title("👥 Customer Segments")
@@ -35,12 +36,12 @@ age_df = age_df.sort_values("age_band")
 
 fig1 = go.Figure()
 fig1.add_trace(go.Bar(name="Policies", x=age_df["age_band"], y=age_df["policies"],
-                      marker_color="#1E2761", yaxis="y1"))
+                      marker_color=NAVY, yaxis="y1"))
 fig1.add_trace(go.Bar(name="Claims",   x=age_df["age_band"], y=age_df["claims"],
-                      marker_color="#0284C7", yaxis="y1"))
+                      marker_color=BLUE, yaxis="y1"))
 fig1.add_trace(go.Scatter(name="Claim Rate %", x=age_df["age_band"], y=age_df["claim_rate"],
                            mode="lines+markers+text", text=[f"{v:.0f}%" for v in age_df["claim_rate"]],
-                           textposition="top center", line=dict(color="#DC2626", width=2.5),
+                           textposition="top center", line=dict(color=RED, width=2.5),
                            marker=dict(size=8), yaxis="y2"))
 fig1.update_layout(
     barmode="group", height=340,
@@ -71,9 +72,9 @@ ten_df["ratio"] = (ten_df["premium"] / ten_df["exposure"].replace(0, float("nan"
 
 fig2 = go.Figure()
 fig2.add_trace(go.Bar(name="Annual Premiums", x=ten_df["tenure_tier"],
-                      y=ten_df["premium"]/1000, marker_color="#047857"))
+                      y=ten_df["premium"]/1000, marker_color=GREEN))
 fig2.add_trace(go.Bar(name="Claim Exposure",  x=ten_df["tenure_tier"],
-                      y=ten_df["exposure"]/1000, marker_color="#DC2626", opacity=0.85))
+                      y=ten_df["exposure"]/1000, marker_color=RED, opacity=0.85))
 fig2.update_layout(
     barmode="group", height=320, yaxis_title="Amount ($K)",
     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
@@ -107,7 +108,7 @@ pivot = pivot.reindex(columns=[t for t in TENURE_ORDER if t in pivot.columns])
 
 fig3 = px.imshow(
     pivot, text_auto=".2f",
-    color_continuous_scale=["#DC2626","#FBBF24","#047857"],
+    color_continuous_scale=[RED, AMBER, GREEN],
     labels=dict(color="Premium/Claim Ratio"),
     aspect="auto",
 )

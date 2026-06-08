@@ -13,6 +13,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.load_data import load_claims_fact
+from data.colors import STATUS_COLORS, BLUE, NAVY, GRID, RISK_SCALE
 
 # ── Page config ───────────────────────────────────────────────
 st.set_page_config(
@@ -74,14 +75,7 @@ with left:
     st.subheader("Claims by Status")
     status_counts = filtered["claim_status"].value_counts().reset_index()
     status_counts.columns = ["Status", "Count"]
-    COLOR_MAP = {
-        "paid":         "#1E2761",
-        "approved":     "#047857",
-        "under_review": "#0284C7",
-        "pending":      "#D97706",
-        "denied":       "#DC2626",
-        "withdrawn":    "#94A3B8",
-    }
+    COLOR_MAP = STATUS_COLORS
     fig_donut = px.pie(
         status_counts, values="Count", names="Status",
         hole=0.55,
@@ -112,7 +106,7 @@ with right:
     fig_line.add_trace(go.Scatter(
         x=monthly["date"], y=monthly["count"],
         fill="tozeroy", fillcolor="rgba(2,132,199,0.15)",
-        line=dict(color="#0284C7", width=2.5),
+        line=dict(color=BLUE, width=2.5),
         name="Claims Filed",
     ))
     fig_line.update_layout(

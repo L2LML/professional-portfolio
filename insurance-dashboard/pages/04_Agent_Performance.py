@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.load_data import load_claims_fact, load_policies
+from data.colors import NAVY, BLUE, GREEN, AMBER, RED, GRID, PRODUCT_COLORS, RISK_SCALE, AGENT_COLORS
 
 st.set_page_config(page_title="Agent Performance", page_icon="🏅", layout="wide")
 st.title("🏅 Agent Performance")
@@ -65,7 +66,7 @@ with left:
         x=agents["premium_revenue"] / 1000,
         y=agents["agent_name"],
         orientation="h",
-        marker_color="#1E2761",
+        marker_color=NAVY,
         text=[f"${v/1000:,.0f}K" for v in agents["premium_revenue"]],
         textposition="outside",
     ))
@@ -95,11 +96,7 @@ with right:
             "policies":          True,
             "total_claims":      True,
         },
-        color_continuous_scale=[
-            [0.0, "#047857"],   # low  — green (healthy)
-            [0.5, "#FACC15"],   # mid  — yellow (watch)
-            [1.0, "#DC2626"],   # high — red (high exposure)
-        ],
+        color_continuous_scale=RISK_SCALE,
         range_color=[0, max(max_ratio, 1.0)],
         labels={
             "policies":         "Policies Written",
@@ -135,19 +132,11 @@ mix = (
     .reset_index(name="count")
 )
 
-PERM_COLORS = {
-    "Term Life":      "#94A3B8",   # gray    — expires, no cash value
-    "Whole Life":     "#1E2761",   # navy    — permanent, guaranteed cash value
-    "Universal Life": "#0284C7",   # blue    — permanent, flexible
-    "Variable Life":  "#7C3AED",   # purple  — permanent, investment-linked
-    "Final Expense":  "#047857",   # green   — small permanent, simplified issue
-}
-
 fig3 = px.bar(
     mix,
     x="agent_name", y="count",
     color="policy_type",
-    color_discrete_map=PERM_COLORS,
+    color_discrete_map=PRODUCT_COLORS,
     labels={"agent_name": "Agent", "count": "Policies Written", "policy_type": "Product"},
     barmode="stack",
 )
