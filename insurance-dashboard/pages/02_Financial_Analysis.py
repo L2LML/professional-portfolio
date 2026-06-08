@@ -9,6 +9,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from data.sidebar_note import show as _sidebar_note
 from data.load_data import load_claims_fact, load_policies
 from data.colors import PRODUCT_COLORS, NAVY, SKY, GREEN, RED, AMBER, GRAY, GRID
 
@@ -21,6 +22,7 @@ st.info(
     "policies are driving profit or loss."
 )
 st.divider()
+_sidebar_note()
 
 df  = load_claims_fact()
 pol = load_policies()

@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
 
+from data.sidebar_note import show as _sidebar_note
 from data.load_data import load_claims_fact
 from data.colors import NAVY, SKY, GREEN, AMBER, RED, GRAY, GRID
 
@@ -24,6 +25,7 @@ st.info(
     "This page tracks SLA compliance across all claims and identifies where the company is at risk."
 )
 st.divider()
+_sidebar_note()
 
 df = load_claims_fact()
 

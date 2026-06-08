@@ -9,12 +9,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from data.sidebar_note import show as _sidebar_note
 from data.load_data import load_claims_fact
 from data.colors import AGING_COLORS, BLUE, SKY, NAVY, GRID, TEXT_MID, STATUS_COLORS, AMBER, RED, GREEN
 
 st.set_page_config(page_title="Claims Operations", page_icon="📋", layout="wide")
 st.title("📋 Claims Operations")
 st.divider()
+_sidebar_note()
 
 df    = load_claims_fact()
 open_ = df[df["claim_status"].isin(["pending","under_review"])].copy()

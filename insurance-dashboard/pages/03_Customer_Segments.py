@@ -9,6 +9,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from data.sidebar_note import show as _sidebar_note
 from data.load_data import load_claims_fact, load_policies, load_policyholders
 import numpy as np
 from data.colors import NAVY, BLUE, GREEN, RED, AMBER, GRID, RISK_SCALE
@@ -17,6 +18,7 @@ st.set_page_config(page_title="Customer Segments", page_icon="👥", layout="wid
 st.title("👥 Customer Segments")
 st.caption("Profitability analysis by age at issuance and customer tenure")
 st.divider()
+_sidebar_note()
 
 df  = load_claims_fact()
 pol = load_policies()

@@ -26,6 +26,17 @@ st.set_page_config(
 
 st.title("🏦 Insurance Claims Dashboard")
 st.caption("Life Insurance Operations · Built with PostgreSQL → Python ETL → Streamlit")
+
+st.warning(
+    "**⚠️ Portfolio Demo — Synthetic Sample Data**\n\n"
+    "All data shown in this dashboard is randomly generated for demonstration purposes only. "
+    "No real policyholders, claims, or financial figures are represented. "
+    "In a production environment, this dashboard connects directly to the "
+    "**Life Insurance Claims PostgreSQL database** via the **Python ETL pipeline** — "
+    "both of which are included in this portfolio. "
+    "See the full project at [github.com/L2LML/professional-portfolio]"
+    "(https://github.com/L2LML/professional-portfolio)."
+)
 st.divider()
 
 df  = load_claims_fact()
