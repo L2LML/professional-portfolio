@@ -117,25 +117,41 @@ with right:
     st.subheader("Decision Time Distribution")
     st.caption(
         "How many days did it take to approve or deny decided claims? "
-        "The vertical line marks the 45-day regulatory deadline. "
-        "Bars to the right of it represent SLA breaches."
+        "🟢 Green bars = within the 45-day SLA. "
+        "🟡 Amber = approaching the limit (31–45 days). "
+        "🔴 Red = SLA breached. The more red, the higher the regulatory risk."
     )
     if not decided.empty:
-        fig2 = px.histogram(
-            decided, x="days_to_decision",
-            nbins=20,
-            color_discrete_sequence=[SKY],
-            labels={"days_to_decision": "Days to Decision", "count": "Claims"},
+        import numpy as np
+        bins   = [0, 10, 20, 30, 45, 60, 90, 999]
+        labels = ["0–10d","11–20d","21–30d","31–45d","46–60d","61–90d","90+d"]
+        colors = [GREEN,   GREEN,   GREEN,   AMBER,   RED,     RED,     RED  ]
+        decided["bin"] = pd.cut(
+            decided["days_to_decision"], bins=bins, labels=labels, right=True
         )
+        bin_counts = decided["bin"].value_counts().reindex(labels, fill_value=0).reset_index()
+        bin_counts.columns = ["Bin","Count"]
+
+        fig2 = go.Figure(go.Bar(
+            x=bin_counts["Bin"],
+            y=bin_counts["Count"],
+            marker_color=colors,
+            text=bin_counts["Count"],
+            textposition="outside",
+        ))
         fig2.add_vline(
-            x=45, line_dash="dash", line_color=RED, line_width=2,
+            x=3.5,              # between "31–45d" and "46–60d" buckets
+            line_dash="dash", line_color=RED, line_width=2,
             annotation_text="45-day SLA limit",
             annotation_font_color=RED,
+            annotation_position="top right",
         )
         fig2.update_layout(
             height=300,
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            xaxis=dict(showgrid=False), yaxis=dict(gridcolor=GRID, title="# Claims"),
+            xaxis=dict(showgrid=False, title="Days to Decision"),
+            yaxis=dict(gridcolor=GRID, title="# Claims"),
+            showlegend=False,
         )
         st.plotly_chart(fig2, use_container_width=True)
 

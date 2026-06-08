@@ -58,23 +58,40 @@ with left:
                        xaxis=dict(showgrid=False), yaxis=dict(showgrid=False))
     st.plotly_chart(fig1, use_container_width=True)
 
-# ── Premium revenue vs claim exposure by product ──────────────
+# ── Net Margin by Product ─────────────────────────────────────
 with right:
-    st.subheader("Premium Revenue vs Claim Exposure")
+    st.subheader("Net Margin by Product")
+    st.caption(
+        "**Net Margin** = Annual Premiums Collected minus Claims Paid. "
+        "🟢 Green = the product generates more in premiums than it pays in claims. "
+        "🔴 Red = claims are exceeding premiums collected — the product is losing money."
+    )
     rev = pol.groupby("policy_type")["annual_premium"].sum().reset_index()
-    exp = df.groupby("policy_type")["claim_amount"].sum().reset_index()
+    exp = df[df["claim_status"]=="paid"].groupby("policy_type")["claim_amount"].sum().reset_index()
     combined = rev.merge(exp, on="policy_type", how="outer").fillna(0)
-    combined.columns = ["Policy Type","Premium Revenue","Claim Exposure"]
+    combined.columns = ["Policy Type","Premiums","Claims Paid"]
+    combined["Net Margin"] = combined["Premiums"] - combined["Claims Paid"]
+    combined = combined.sort_values("Net Margin", ascending=True)
+    combined["color"] = combined["Net Margin"].apply(
+        lambda v: GREEN if v >= 0 else RED
+    )
 
-    fig2 = go.Figure()
-    fig2.add_trace(go.Bar(name="Premium Revenue", x=combined["Policy Type"],
-                          y=combined["Premium Revenue"]/1000, marker_color=GREEN))
-    fig2.add_trace(go.Bar(name="Claim Exposure",  x=combined["Policy Type"],
-                          y=combined["Claim Exposure"]/1000,  marker_color=RED, opacity=0.8))
-    fig2.update_layout(barmode="group", height=300, yaxis_title="Amount ($K)",
-                       paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                       xaxis=dict(showgrid=False), yaxis=dict(gridcolor="#E2E8F0"),
-                       legend=dict(orientation="h", y=1.1))
+    fig2 = go.Figure(go.Bar(
+        x=combined["Net Margin"] / 1000,
+        y=combined["Policy Type"],
+        orientation="h",
+        marker_color=combined["color"].tolist(),
+        text=[f"${v/1000:+,.0f}K" for v in combined["Net Margin"]],
+        textposition="outside",
+    ))
+    fig2.add_vline(x=0, line_color="black", line_width=1)
+    fig2.update_layout(
+        height=300,
+        xaxis_title="Net Margin ($K)",
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(showgrid=False),
+        yaxis=dict(showgrid=False),
+    )
     st.plotly_chart(fig2, use_container_width=True)
 
 # ── Running total of payouts ──────────────────────────────────

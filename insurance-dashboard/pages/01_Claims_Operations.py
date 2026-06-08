@@ -46,25 +46,38 @@ with left:
 
 # ── Examiner workload ─────────────────────────────────────────
 with right:
-    st.subheader("Examiner Workload")
-    workload = (
-        open_[open_["assigned_examiner"].notna()]
-        .groupby("assigned_examiner")
-        .agg(count=("claim_id","count"), avg_days=("days_open","mean"))
-        .reset_index()
-        .sort_values("count", ascending=True)
+    st.subheader("Examiner Workload by Claim Status")
+    st.caption(
+        "**Pending** = filed but examiner not yet actively reviewing. "
+        "**Under Review** = examiner is actively investigating. "
+        "A heavy Pending load means claims are sitting idle."
     )
-    if not workload.empty:
-        fig2 = go.Figure(go.Bar(
-            x=workload["count"], y=workload["assigned_examiner"],
-            orientation="h", marker_color=BLUE,
-            text=[f"{c} claims · {d:.0f} avg days" for c, d in
-                  zip(workload["count"], workload["avg_days"])],
-            textposition="outside",
-        ))
-        fig2.update_layout(height=300,
-                           paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                           xaxis=dict(showgrid=False), yaxis=dict(showgrid=False))
+    assigned = open_[open_["assigned_examiner"].notna()]
+    if not assigned.empty:
+        workload = (
+            assigned.groupby(["assigned_examiner","claim_status"])
+            .size().reset_index(name="count")
+        )
+        STATUS_C = {"pending": AMBER, "under_review": SKY}
+        fig2 = px.bar(
+            workload,
+            x="count", y="assigned_examiner",
+            color="claim_status",
+            color_discrete_map=STATUS_C,
+            orientation="h",
+            barmode="stack",
+            labels={"count":"Claims","assigned_examiner":"Examiner",
+                    "claim_status":"Status"},
+            text="count",
+        )
+        fig2.update_traces(textposition="inside", textfont_color="white")
+        fig2.update_layout(
+            height=300,
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=False, title="Open Claims"),
+            yaxis=dict(showgrid=False),
+            legend=dict(orientation="h", y=1.12, title=""),
+        )
         st.plotly_chart(fig2, use_container_width=True)
 
 # ── Cause of death distribution ───────────────────────────────
