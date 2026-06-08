@@ -6,8 +6,9 @@ represented by the same color across the entire dashboard.
 """
 
 # ── Brand ─────────────────────────────────────────────────────
-NAVY        = "#1E2761"   # primary — titles, dominant bars
-BLUE        = "#0284C7"   # secondary — highlights, trends
+NAVY        = "#1E2761"   # primary — dark navy, dominant bars, titles
+SKY         = "#38BDF8"   # secondary — bright sky blue, clearly distinct from navy
+BLUE        = SKY         # alias so existing imports keep working
 LIGHT_BG    = "#F4F7FF"   # page background
 CARD_BG     = "#FFFFFF"
 GRID        = "#E2E8F0"
@@ -25,7 +26,7 @@ PURPLE  = "#7C3AED"   # variable / investment products
 STATUS_COLORS = {
     "paid":         NAVY,
     "approved":     GREEN,
-    "under_review": BLUE,
+    "under_review": SKY,
     "pending":      AMBER,
     "denied":       RED,
     "withdrawn":    GRAY,
@@ -35,7 +36,7 @@ STATUS_COLORS = {
 PRODUCT_COLORS = {
     "Term Life":      GRAY,     # temporary — no cash value
     "Whole Life":     NAVY,     # permanent flagship
-    "Universal Life": BLUE,     # permanent flexible
+    "Universal Life": SKY,      # permanent flexible  ← clearly lighter than navy now
     "Variable Life":  PURPLE,   # permanent investment-linked
     "Final Expense":  GREEN,    # small permanent
 }
@@ -54,13 +55,13 @@ RISK_SCALE = [
     [1.0, RED],
 ]
 
-# ── Sequential blue scale (for volume/revenue metrics) ───────
+# ── Sequential navy→sky scale (for volume metrics) ───────────
 BLUE_SCALE = [
-    [0.0, "#DBEAFE"],
-    [1.0, NAVY],
+    [0.0, NAVY],
+    [1.0, SKY],
 ]
 
 # ── Agents — qualitative (8 distinct, accessible colors) ─────
 AGENT_COLORS = [
-    NAVY, BLUE, GREEN, AMBER, RED, PURPLE, "#0891B2", "#B45309"
+    NAVY, SKY, GREEN, AMBER, RED, PURPLE, "#0891B2", "#B45309"
 ]
