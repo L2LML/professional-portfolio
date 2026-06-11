@@ -187,9 +187,9 @@ with right:
         breached    = bin_counts[bin_counts["Bin"].isin(["46–60d","61–90d","90+d"])]["Count"].sum()
         sla_pct = within_sla / max(total_decided,1) * 100
         z1, z2, z3 = st.columns(3)
-        z1.metric("✅ Within 45-Day SLA", f"{within_sla} claims", f"{sla_pct:.0f}% of decided", delta_color="off")
-        z2.metric("🔴 SLA Breached",      f"{breached} claims",    f"{100-sla_pct:.0f}% of decided", delta_color="off")
-        z3.metric("Total Decided",         f"{total_decided} claims", help="Approved + denied claims with a recorded decision date.")
+        z1.metric("✅ Within SLA",  f"{within_sla}",  f"{sla_pct:.0f}% of decided",       delta_color="off")
+        z2.metric("🔴 SLA Breached", f"{breached}",   f"{100-sla_pct:.0f}% of decided",   delta_color="off")
+        z3.metric("Total Decided",   f"{total_decided}", "approved + denied claims",        delta_color="off")
 
 # ── Breached/At-Risk Claims Table ─────────────────────────────
 st.subheader("🚨 Claims Requiring Immediate Action")
@@ -208,8 +208,8 @@ else:
     def color_days(val):
         try:
             v = float(val)
-            if v >= 45: return f"background-color: {RED}22; color: {RED}; font-weight: bold"
-            if v >= 30: return f"background-color: {AMBER}22; color: {AMBER}; font-weight: bold"
+            if v >= 45: return f"background-color: {RED}22; color: {NAVY}; font-weight: bold"
+            if v >= 30: return f"background-color: {AMBER}22; color: {NAVY}; font-weight: bold"
         except: pass
         return ""
 

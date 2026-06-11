@@ -17,7 +17,7 @@ TEXT_MID    = "#64748B"
 
 # ── Semantic (same meaning everywhere) ───────────────────────
 GREEN   = "#047857"   # good / paid / on track / low risk
-AMBER   = "#D97706"   # watch / aging / moderate
+AMBER   = "#FFD700"   # watch / aging / moderate
 RED     = "#DC2626"   # bad / denied / overdue / high risk
 GRAY    = "#94A3B8"   # neutral / expired / withdrawn
 PURPLE  = "#7C3AED"   # variable / investment products
