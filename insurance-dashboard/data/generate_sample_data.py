@@ -152,7 +152,8 @@ def rand_filed_date(status):
         )[0]
         return today - timedelta(days=days_ago)
     else:
-        return rand_date(date(2018, 1, 1), date(2024, 6, 1))
+        # Spread historical claims evenly across 2022-2024 for meaningful YoY comparison
+        return rand_date(date(2022, 1, 1), date(2024, 12, 31))
 
 filed_dates = [rand_filed_date(statuses[i]) for i in range(n_c)]
 death_dates = [fd - timedelta(days=random.randint(3, 45)) for fd in filed_dates]

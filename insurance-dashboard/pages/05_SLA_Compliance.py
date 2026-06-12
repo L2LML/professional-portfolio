@@ -126,7 +126,7 @@ with left:
             yaxis=dict(gridcolor=GRID),
             legend=dict(orientation="h", y=1.15, title=""),
         )
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, width="stretch")
 
 with right:
     st.subheader("Decision Time Distribution")
@@ -180,7 +180,7 @@ with right:
             uniformtext_minsize=8,
             uniformtext_mode="hide",
         )
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width="stretch")
 
         # Zone summary below chart
         within_sla = bin_counts[bin_counts["Bin"].isin(["0–10d","11–20d","21–30d","31–45d"])]["Count"].sum()
@@ -222,7 +222,7 @@ else:
         }).style.format({
             "Amount":"${:,.0f}","Days Open":"{:.0f}"
         }).applymap(color_days, subset=["Days Open"]),
-        use_container_width=True, hide_index=True,
+        width="stretch", hide_index=True,
     )
 
 # ── Reserve Detail ────────────────────────────────────────────
@@ -265,7 +265,7 @@ with col_left:
         paper_bgcolor="rgba(0,0,0,0)",
         margin=dict(t=20, b=20, l=20, r=20),
     )
-    st.plotly_chart(fig_res, use_container_width=True)
+    st.plotly_chart(fig_res, width="stretch")
 
 with col_right:
     total_reserve = reserve_df["reserve_estimate"].sum()
@@ -281,6 +281,6 @@ with col_right:
             "Open Exposure":    "${:,.0f}",
             "Reserve Estimate": "${:,.0f}",
         }),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )

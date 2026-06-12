@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.title("🏦 Insurance Claims Dashboard")
+st.title("🏦 Lisa's Insurance Claims Dashboard")
 st.caption("Life Insurance Operations · Built with PostgreSQL → Python ETL → Streamlit")
 
 st.warning(
@@ -83,8 +83,11 @@ sla_compliant_pct = (
 )
 
 # ── Year-over-year trend calculations ────────────────────────
-curr_yr = int(filtered["claim_year"].max()) if len(filtered) else 2024
-prev_yr = curr_yr - 1
+# Find the two most recent years with PAID or DECIDED claims (excludes open claims)
+decided = filtered[filtered["claim_status"].isin(["paid","approved","denied"])]
+years_with_data = sorted(decided["claim_year"].dropna().unique().tolist(), reverse=True)
+curr_yr = int(years_with_data[0]) if len(years_with_data) > 0 else 2024
+prev_yr = int(years_with_data[1]) if len(years_with_data) > 1 else curr_yr - 1
 
 curr_df = filtered[filtered["claim_year"] == curr_yr]
 prev_df = filtered[filtered["claim_year"] == prev_yr]
@@ -150,7 +153,7 @@ c1.metric(
     help="Total claims across all years. Arrow = current year vs prior year."
 )
 c2.metric(
-    "Loss Ratio", f"{loss_ratio:.2f}",
+    "Portfolio Loss Ratio", f"{loss_ratio:.2f}",
     delta=lr_delta_str, delta_color=lr_delta_color,
     help="Claims paid ÷ total premiums collected. Below 0.70 = healthy."
 )
@@ -205,7 +208,7 @@ with left:
         showlegend=False, margin=dict(t=10, b=10, l=10, r=10),
         height=320, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
     )
-    st.plotly_chart(fig_donut, use_container_width=True)
+    st.plotly_chart(fig_donut, width="stretch")
 
 # Monthly trend — current year vs prior year
 with right:
@@ -253,7 +256,7 @@ with right:
         yaxis=dict(gridcolor=GRID, title="Claims Filed"),
         legend=dict(orientation="h", y=1.12),
     )
-    st.plotly_chart(fig_yoy, use_container_width=True)
+    st.plotly_chart(fig_yoy, width="stretch")
 
 # ── Open high-value claims ────────────────────────────────────
 st.subheader("⚠️ Open High-Value Claims  (> $250,000)")
@@ -279,5 +282,5 @@ else:
             "date_filed":"Filed","days_open":"Days Open",
             "aging_flag":"Aging","assigned_examiner":"Examiner"
         }).style.format({"Amount":"${:,.0f}","Days Open":"{:.0f}"}),
-        use_container_width=True, hide_index=True,
+        width="stretch", hide_index=True,
     )

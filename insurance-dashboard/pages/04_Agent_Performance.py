@@ -108,7 +108,7 @@ with left:
         yaxis=dict(showgrid=False),
         legend=dict(orientation="h", y=1.15, title=""),
     )
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, width="stretch")
 
 # ── Policies written vs claims filed scatter ──────────────────
 with right:
@@ -165,7 +165,7 @@ with right:
         yaxis=dict(gridcolor=GRID, title="Claims Filed"),
         legend=dict(orientation="h", y=1.15, title="Dominant Claim Type:"),
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
 # ── Portfolio Mix — what product types each agent is selling ──
 st.subheader("Agent Portfolio Mix — Policy Type Breakdown")
@@ -196,7 +196,7 @@ fig3.update_layout(
     yaxis=dict(gridcolor="#E2E8F0", title="Policies Written"),
     legend=dict(orientation="h", y=1.12, title=""),
 )
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(fig3, width="stretch")
 
 # ── Revenue efficiency callouts ────────────────────────────────
 st.subheader("Revenue Efficiency")

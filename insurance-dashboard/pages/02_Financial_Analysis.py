@@ -77,7 +77,7 @@ with left:
                    tickformat="$,.0f"),
         yaxis=dict(showgrid=False),
     )
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, width="stretch")
 
 # ── Loss Ratio by Product ─────────────────────────────────────
 with right:
@@ -119,7 +119,7 @@ with right:
         yaxis=dict(showgrid=False),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
 # ── Running total of payouts ──────────────────────────────────
 st.subheader("Cumulative Payouts Over Time")
@@ -144,7 +144,7 @@ fig3.update_layout(
     xaxis=dict(showgrid=False), yaxis=dict(gridcolor="#E2E8F0"),
     showlegend=False,
 )
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(fig3, width="stretch")
 
 # ── Denial analysis ───────────────────────────────────────────
 st.subheader("Denial Analysis")
@@ -165,7 +165,7 @@ with col2:
         .rename(columns={"claim_id":"Count"})
     )
     if not by_reason.empty:
-        st.dataframe(by_reason, use_container_width=True, hide_index=True)
+        st.dataframe(by_reason, width="stretch", hide_index=True)
 
 # ── Unit Economics by Product ─────────────────────────────────
 st.divider()
@@ -208,4 +208,4 @@ fig_unit.update_layout(
     yaxis=dict(gridcolor=GRID, title="Amount ($)"),
     legend=dict(orientation="h", y=1.12),
 )
-st.plotly_chart(fig_unit, use_container_width=True)
+st.plotly_chart(fig_unit, width="stretch")

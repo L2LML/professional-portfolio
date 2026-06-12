@@ -70,7 +70,7 @@ fig1.update_layout(
     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
     legend=dict(orientation="h", y=1.12), xaxis=dict(showgrid=False),
 )
-st.plotly_chart(fig1, use_container_width=True)
+st.plotly_chart(fig1, width="stretch")
 
 # ── Tenure Cohort ─────────────────────────────────────────────
 st.subheader("Premium Revenue vs Claim Exposure by Tenure")
@@ -101,7 +101,7 @@ fig2.update_layout(
     xaxis=dict(showgrid=False), yaxis=dict(gridcolor="#E2E8F0"),
     legend=dict(orientation="h", y=1.1),
 )
-st.plotly_chart(fig2, use_container_width=True)
+st.plotly_chart(fig2, width="stretch")
 
 # ── Age × Tenure Loss Ratio Matrix ───────────────────────────
 st.subheader("Which Customer Segments Are Most Profitable?")
@@ -201,7 +201,7 @@ fig3.update_layout(
     ),
     margin=dict(t=20, b=60),
 )
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(fig3, width="stretch")
 
 # Insight callout
 if not matrix.empty:

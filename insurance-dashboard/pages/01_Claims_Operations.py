@@ -83,7 +83,7 @@ with left:
             yaxis=dict(gridcolor=GRID),
             legend=dict(orientation="h", y=1.15, title=""),
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
 # ── Examiner workload ─────────────────────────────────────────
 with right:
@@ -119,7 +119,7 @@ with right:
             yaxis=dict(showgrid=False),
             legend=dict(orientation="h", y=1.15, title=""),
         )
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width="stretch")
 
 # ── Cause of death distribution ───────────────────────────────
 st.subheader("Claims by Cause of Death")
@@ -162,7 +162,7 @@ fig3.update_layout(
     uniformtext_minsize=8,
     uniformtext_mode="hide",
 )
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(fig3, width="stretch")
 
 # ── Open claims detail table ──────────────────────────────────
 st.subheader("Open Claims Detail")
@@ -177,7 +177,7 @@ st.dataframe(
         "date_filed":"Filed","days_open":"Days Open",
         "aging_flag":"Aging","assigned_examiner":"Examiner"
     }).style.format({"Amount":"${:,.0f}","Days Open":"{:.0f}"}),
-    use_container_width=True, hide_index=True,
+    width="stretch", hide_index=True,
 )
 
 # ── Examiner Consistency ──────────────────────────────────────
@@ -244,7 +244,7 @@ if not decided.empty:
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(t=20, b=20),
     )
-    st.plotly_chart(fig_ex, use_container_width=True)
+    st.plotly_chart(fig_ex, width="stretch")
     st.caption(
         "Bubble size = number of claims decided. "
         "Dashed lines show team averages. "
