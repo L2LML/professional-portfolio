@@ -223,11 +223,9 @@ with right:
         .agg(count=("claim_id","count"))
         .reset_index()
     )
-    current_year = int(filtered["claim_year"].max()) if len(filtered) > 0 else 2024
-    prior_year   = current_year - 1
-
-    curr = monthly[monthly["claim_year"] == current_year].set_index("claim_month")["count"]
-    prev = monthly[monthly["claim_year"] == prior_year].set_index("claim_month")["count"]
+    # Use the same curr_yr/prev_yr calculated above for KPI cards
+    curr = monthly[monthly["claim_year"] == curr_yr].set_index("claim_month")["count"]
+    prev = monthly[monthly["claim_year"] == prev_yr].set_index("claim_month")["count"]
     months = list(range(1, 13))
     month_labels = ["Jan","Feb","Mar","Apr","May","Jun",
                     "Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -237,7 +235,7 @@ with right:
     fig_yoy.add_trace(go.Bar(
         x=month_labels,
         y=[prev.get(m, 0) for m in months],
-        name=str(prior_year),
+        name=str(prev_yr),
         marker_color=GRAY,
         opacity=0.5,
     ))
@@ -245,11 +243,11 @@ with right:
     fig_yoy.add_trace(go.Bar(
         x=month_labels,
         y=[curr.get(m, 0) for m in months],
-        name=str(current_year),
+        name=str(curr_yr),
         marker_color=NAVY,
     ))
     fig_yoy.update_layout(
-        barmode="overlay",
+        barmode="group",
         height=320, margin=dict(t=10, b=10, l=10, r=10),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         xaxis=dict(showgrid=False),
