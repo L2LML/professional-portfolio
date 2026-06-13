@@ -53,21 +53,41 @@ agents["premium_to_claim"] = (
 agents = agents.sort_values("premium_revenue", ascending=False)
 
 # ── KPIs ──────────────────────────────────────────────────────
-top_agent    = agents.iloc[0]["agent_name"] if not agents.empty else "—"
-avg_prem_pol = (agents["premium_revenue"] / agents["policies"].replace(0,1)).mean()
-high_exposure = (agents["claims_per_policy"] >= 1.0).sum()
+top_agent       = agents.iloc[0] if not agents.empty else None
+top_name        = top_agent["agent_name"] if top_agent is not None else "—"
+top_revenue     = top_agent["premium_revenue"] if top_agent is not None else 0
+avg_prem_pol    = (agents["premium_revenue"] / agents["policies"].replace(0, 1)).mean()
+avg_claims_pol  = agents["claims_per_policy"].mean()
+lowest_exposure = agents.loc[agents["claims_per_policy"].idxmin()] if not agents.empty else None
 
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Total Agents", len(agents),
-          help="Number of active licensed agents in the portfolio.")
-c2.metric("Total Annual Premiums", f"${agents['premium_revenue'].sum()/1e6:.2f}M",
+c1.metric("Top Agent by Revenue",
+          top_name.split()[-1] if top_name != "—" else "—",
+          delta=f"${top_revenue:,.0f} annual premiums",
+          delta_color="off",
+          help="Agent with the highest total annual premium revenue.")
+c2.metric("Total Annual Premiums",
+          f"${agents['premium_revenue'].sum()/1e6:.2f}M",
           help="Sum of all annual premiums written across all agents.")
-c3.metric("Avg Premium per Policy", f"${avg_prem_pol:,.0f}",
+c3.metric("Avg Premium per Policy",
+          f"${avg_prem_pol:,.0f}",
           help="Higher = agents are writing higher-value coverage on average.")
-c4.metric("Agents with High Exposure", f"{high_exposure} of {len(agents)}",
-          delta="≥ 1 claim per policy written",
-          delta_color="off" if high_exposure == 0 else "inverse",
-          help="Agents where total claims filed equals or exceeds policies written.")
+c4.metric("Avg Claims per Policy",
+          f"{avg_claims_pol:.2f}",
+          delta="across all agents",
+          delta_color="off",
+          help="Total claims filed ÷ total policies written. Lower = healthier book of business.")
+st.divider()
+
+# ── Auto-generated insight ────────────────────────────────────
+if top_agent is not None and lowest_exposure is not None:
+    low_name = lowest_exposure["agent_name"]
+    low_cpp  = lowest_exposure["claims_per_policy"]
+    st.info(
+        f"**{top_name}** leads the portfolio with **${top_revenue:,.0f}** in annual premiums. "
+        f"**{low_name}** has the lowest claims per policy at **{low_cpp:.2f}** — "
+        "the healthiest claims ratio on the team."
+    )
 st.divider()
 
 left, right = st.columns(2)
@@ -167,49 +187,68 @@ with right:
     )
     st.plotly_chart(fig2, width="stretch")
 
-# ── Portfolio Mix — what product types each agent is selling ──
-st.subheader("Agent Portfolio Mix — Policy Type Breakdown")
+# ── Agent Leaderboard Table ───────────────────────────────────
+st.divider()
+st.subheader("📋 Agent Leaderboard")
 st.caption(
-    "Permanent policies (Whole Life, Universal Life, Variable Life) generate long-term "
-    "premium revenue and build cash value. A healthy agent portfolio balances term and "
-    "permanent products. Agents with more permanent policies deliver higher lifetime value."
+    "All key metrics per agent in one view. "
+    "**Avg Premium/Policy** = book quality — higher means the agent writes higher-value coverage. "
+    "**Claims/Policy** = claims health — lower is better. "
+    "🟢 Below 0.30 · 🟡 0.30–0.50 · 🔴 Above 0.50."
 )
 
-mix = (
-    pol.groupby(["agent_name","policy_type"])
-    .size()
-    .reset_index(name="count")
+leaderboard = agents.copy()
+leaderboard["premium_per_policy"] = (
+    leaderboard["premium_revenue"] / leaderboard["policies"].replace(0, 1)
+).round(0)
+
+# Relative benchmarking — compare each agent to the team average
+team_avg_cpp = leaderboard["claims_per_policy"].mean()
+team_std_cpp = leaderboard["claims_per_policy"].std()
+low_threshold  = team_avg_cpp - 0.5 * team_std_cpp   # below avg = green
+high_threshold = team_avg_cpp + 0.5 * team_std_cpp   # above avg = red
+
+leaderboard["zone"] = leaderboard["claims_per_policy"].apply(
+    lambda r: "🟢 Low Risk" if r < low_threshold
+    else ("🔴 High Risk" if r > high_threshold else "🟡 Average")
 )
+leaderboard = leaderboard.sort_values("premium_revenue", ascending=False)
+leaderboard.insert(0, "Rank", range(1, len(leaderboard) + 1))
 
-fig3 = px.bar(
-    mix,
-    x="agent_name", y="count",
-    color="policy_type",
-    color_discrete_map=PRODUCT_COLORS,
-    labels={"agent_name": "Agent", "count": "Policies Written", "policy_type": "Product"},
-    barmode="stack",
+def color_cpp(val):
+    try:
+        v = float(val)
+        if v < low_threshold:  return f"color: {GREEN}; font-weight: bold"
+        if v > high_threshold: return f"color: {RED}; font-weight: bold"
+        return f"color: {AMBER}; font-weight: bold"
+    except:
+        return ""
+
+st.caption(
+    f"**Claims/Policy zones are relative to the team average of {team_avg_cpp:.2f}.** "
+    f"Higher claims per policy = more exposure = higher risk. "
+    f"🟢 Low Risk (< {low_threshold:.2f}) · "
+    f"🟡 Average ({low_threshold:.2f}–{high_threshold:.2f}) · "
+    f"🔴 High Risk (> {high_threshold:.2f})."
 )
-fig3.update_layout(
-    height=340,
-    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    xaxis=dict(showgrid=False, title=""),
-    yaxis=dict(gridcolor="#E2E8F0", title="Policies Written"),
-    legend=dict(orientation="h", y=1.12, title=""),
+st.dataframe(
+    leaderboard[[
+        "Rank","agent_name","agent_state","policies",
+        "premium_revenue","premium_per_policy",
+        "total_claims","claims_per_policy","zone"
+    ]].rename(columns={
+        "agent_name":        "Agent",
+        "agent_state":       "State",
+        "policies":          "Policies",
+        "premium_revenue":   "Annual Revenue",
+        "premium_per_policy":"Avg Premium/Policy",
+        "total_claims":      "Claims Filed",
+        "claims_per_policy": "Claims/Policy",
+        "zone":              "Zone",
+    }).style.format({
+        "Annual Revenue":     "${:,.0f}",
+        "Avg Premium/Policy": "${:,.0f}",
+        "Claims/Policy":      "{:.2f}",
+    }).map(color_cpp, subset=["Claims/Policy"]),
+    width="stretch", hide_index=True,
 )
-st.plotly_chart(fig3, width="stretch")
-
-# ── Revenue efficiency callouts ────────────────────────────────
-st.subheader("Revenue Efficiency")
-st.caption("Annual premium per policy written — higher means the agent is selling higher-value coverage.")
-
-eff = agents.copy()
-eff["premium_per_policy"] = (eff["premium_revenue"] / eff["policies"]).round(0)
-eff = eff.sort_values("premium_per_policy", ascending=False)
-
-cols = st.columns(len(eff))
-for col, row in zip(cols, eff.itertuples()):
-    col.metric(
-        label=row.agent_name.split()[-1],   # last name only to fit
-        value=f"${row.premium_per_policy:,.0f}",
-        delta=f"{row.policies} policies",
-    )

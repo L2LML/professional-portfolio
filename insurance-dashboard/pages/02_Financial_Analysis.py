@@ -209,3 +209,50 @@ fig_unit.update_layout(
     legend=dict(orientation="h", y=1.12),
 )
 st.plotly_chart(fig_unit, width="stretch")
+
+# ── Premium Collected vs Claim Paid per Policy ────────────────
+st.divider()
+st.subheader("💼 Premium Collected vs Claim Paid — Per Policy")
+st.caption(
+    "For each paid claim, this compares the total premiums collected from that policy over its lifetime "
+    "vs the amount the company paid out. "
+    "🔴 Red = company paid out more than it collected from that policy. "
+    "🟢 Green = policy was profitable before the claim."
+)
+
+today = pd.Timestamp.today()
+paid_detail = paid[["policyholder_name","policy_type","annual_premium",
+                     "issue_date","claim_amount"]].copy()
+paid_detail["years_in_force"] = (
+    (today - pd.to_datetime(paid_detail["issue_date"])).dt.days / 365.25
+).clip(lower=1).round(1)
+paid_detail["total_collected"] = (paid_detail["annual_premium"] * paid_detail["years_in_force"]).round(0)
+paid_detail["net"] = (paid_detail["total_collected"] - paid_detail["claim_amount"]).round(0)
+paid_detail = paid_detail.sort_values("net", ascending=True)
+
+def color_net(val):
+    try:
+        if float(val) < 0:
+            return f"color: {RED}; font-weight: bold"
+        return f"color: {GREEN}; font-weight: bold"
+    except:
+        return ""
+
+st.dataframe(
+    paid_detail.drop(columns=["issue_date"]).rename(columns={
+        "policyholder_name": "Policyholder",
+        "policy_type":       "Product",
+        "years_in_force":    "Yrs Active",
+        "annual_premium":    "Annual Premium",
+        "total_collected":   "Total Collected",
+        "claim_amount":      "Claim Paid",
+        "net":               "Net (Collected − Paid)",
+    }).style.format({
+        "Annual Premium":        "${:,.0f}",
+        "Total Collected":       "${:,.0f}",
+        "Claim Paid":            "${:,.0f}",
+        "Net (Collected − Paid)":"${:,.0f}",
+    }).map(color_net, subset=["Net (Collected − Paid)"]),
+    width="stretch",
+    hide_index=True,
+)

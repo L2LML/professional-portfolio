@@ -221,7 +221,7 @@ else:
             "days_open":"Days Open","assigned_examiner":"Examiner"
         }).style.format({
             "Amount":"${:,.0f}","Days Open":"{:.0f}"
-        }).applymap(color_days, subset=["Days Open"]),
+        }).map(color_days, subset=["Days Open"]),
         width="stretch", hide_index=True,
     )
 

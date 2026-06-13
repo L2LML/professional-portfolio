@@ -1,4 +1,4 @@
-"""Customer Segments — age bands, tenure cohorts, profitability matrix."""
+"""Customer Segments — profitability matrix and monthly premium collection."""
 
 import sys
 from pathlib import Path
@@ -12,7 +12,7 @@ import streamlit as st
 from data.sidebar_note import show as _sidebar_note
 from data.load_data import load_claims_fact, load_policies, load_policyholders
 import numpy as np
-from data.colors import NAVY, BLUE, GREEN, RED, AMBER, GRID, RISK_SCALE
+from data.colors import NAVY, BLUE, GREEN, RED, AMBER, GRID, RISK_SCALE, SKY
 
 st.set_page_config(page_title="Customer Segments", page_icon="👥", layout="wide")
 st.title("👥 Customer Segments")
@@ -27,81 +27,8 @@ ph  = load_policyholders()
 AGE_ORDER    = ["18–35 Young Adult","36–50 Middle Age","51–65 Pre-Retirement","65+ Senior"]
 TENURE_ORDER = ["New (0–2 yrs)","Establishing (3–5 yrs)","Loyal (6–10 yrs)","Long-Term (11+ yrs)"]
 
-# ── Age Band — Average Claim vs Average Premium ───────────────
-st.subheader("Average Claim Size vs Annual Premium by Age Band")
-st.caption(
-    "**Average Claim Size** = the typical payout when a claim is filed for this age group. "
-    "**Average Annual Premium** = what a typical policy costs per year for this age group. "
-    "Older policyholders typically carry higher face-value policies — and thus larger claims. "
-    "🟢 Green = premiums. 🔴 Red = average claim."
-)
-
-age_prem = (
-    pol[pol["age_band"].notna()]
-    .groupby("age_band")["annual_premium"].mean()
-    .reset_index().rename(columns={"annual_premium":"avg_premium"})
-)
-age_claim = (
-    df[df["age_band"].notna() & (df["claim_status"]=="paid")]
-    .groupby("age_band")["claim_amount"].mean()
-    .reset_index().rename(columns={"claim_amount":"avg_claim"})
-)
-age_df = age_prem.merge(age_claim, on="age_band", how="left").fillna(0)
-age_df = age_df[age_df["age_band"].isin(AGE_ORDER)]
-age_df["age_band"] = pd.Categorical(age_df["age_band"], categories=AGE_ORDER, ordered=True)
-age_df = age_df.sort_values("age_band")
-
-fig1 = go.Figure()
-fig1.add_trace(go.Bar(
-    name="Avg Annual Premium", x=age_df["age_band"], y=age_df["avg_premium"],
-    marker_color=GREEN,
-    text=[f"${v:,.0f}" for v in age_df["avg_premium"]],
-    textposition="outside",
-))
-fig1.add_trace(go.Bar(
-    name="Avg Claim When Filed", x=age_df["age_band"], y=age_df["avg_claim"],
-    marker_color=RED, opacity=0.85,
-    text=[f"${v:,.0f}" for v in age_df["avg_claim"]],
-    textposition="outside",
-))
-fig1.update_layout(
-    barmode="group", height=340,
-    yaxis=dict(title="Amount ($)", gridcolor=GRID, tickformat="$,.0f"),
-    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    legend=dict(orientation="h", y=1.12), xaxis=dict(showgrid=False),
-)
-st.plotly_chart(fig1, width="stretch")
-
-# ── Tenure Cohort ─────────────────────────────────────────────
-st.subheader("Premium Revenue vs Claim Exposure by Tenure")
-ten_pol = (
-    pol[pol["tenure_tier"].notna()]
-    .groupby("tenure_tier")
-    .agg(premium=("annual_premium","sum"), count=("policy_id","count"))
-    .reset_index()
-)
-ten_claims = (
-    df[df["tenure_tier"].notna()]
-    .groupby("tenure_tier")["claim_amount"]
-    .sum().reset_index().rename(columns={"claim_amount":"exposure"})
-)
-ten_df = ten_pol.merge(ten_claims, on="tenure_tier", how="left").fillna(0)
-ten_df["tenure_tier"] = pd.Categorical(ten_df["tenure_tier"], categories=TENURE_ORDER, ordered=True)
-ten_df = ten_df.sort_values("tenure_tier")
-ten_df["ratio"] = (ten_df["premium"] / ten_df["exposure"].replace(0, float("nan"))).round(2)
-
-fig2 = go.Figure()
-fig2.add_trace(go.Bar(name="Annual Premiums", x=ten_df["tenure_tier"],
-                      y=ten_df["premium"]/1000, marker_color=GREEN))
-fig2.add_trace(go.Bar(name="Claim Exposure",  x=ten_df["tenure_tier"],
-                      y=ten_df["exposure"]/1000, marker_color=RED, opacity=0.85))
-fig2.update_layout(
-    barmode="group", height=320, yaxis_title="Amount ($K)",
-    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-    xaxis=dict(showgrid=False), yaxis=dict(gridcolor="#E2E8F0"),
-    legend=dict(orientation="h", y=1.1),
-)
-st.plotly_chart(fig2, width="stretch")
+# Compute lifetime premiums once — used throughout this page
+pol["total_collected"] = pol["annual_premium"] * pol["years_in_force"].clip(lower=1)
 
 # ── Age × Tenure Loss Ratio Matrix ───────────────────────────
 st.subheader("Which Customer Segments Are Most Profitable?")
@@ -124,7 +51,6 @@ paid_matrix = (
     .groupby(["age_band","tenure_tier"])["claim_amount"].sum()
     .reset_index().rename(columns={"claim_amount":"claims_paid"})
 )
-# Use total premiums collected (annual × years in force) so loss ratio is apples-to-apples
 pol_seg = pol[pol["age_band"].notna() & pol["tenure_tier"].notna()].copy()
 pol_seg["total_collected"] = pol_seg["annual_premium"] * pol_seg["years_in_force"].clip(lower=1)
 pol_matrix = (
@@ -140,21 +66,9 @@ pivot = matrix.pivot(index="age_band", columns="tenure_tier", values="loss_ratio
 pivot = pivot.reindex(index=[a for a in AGE_ORDER if a in pivot.index])
 pivot = pivot.reindex(columns=[t for t in TENURE_ORDER if t in pivot.columns])
 
-# Label each cell with the loss ratio AND a plain-English zone
-def cell_label(val):
-    if pd.isna(val):
-        return "No data"
-    zone = "✅ Healthy" if val < 0.70 else ("⚠️ Watch" if val < 1.0 else "🔴 High Risk")
-    return f"{val:.2f}\n{zone}"
-
-label_pivot = pivot.applymap(cell_label)
-
-# Scale the color range to the actual data so variation is visible
 actual_max = min(pivot.max().max() * 1.1, 1.5) if not pivot.empty else 1.0
-actual_max = max(actual_max, 0.90)  # at least show the benchmark range
+actual_max = max(actual_max, 0.90)
 
-# Color stops anchored to insurance benchmarks (not just 0-1)
-# < 0.70 = green, 0.70-0.85 = amber, > 0.85 = red
 fig3 = px.imshow(
     pivot,
     text_auto=False,
@@ -169,7 +83,6 @@ fig3 = px.imshow(
     aspect="auto",
 )
 
-# Add cell annotations manually with both number and zone label
 for i, age in enumerate(pivot.index):
     for j, tenure in enumerate(pivot.columns):
         val = pivot.loc[age, tenure]
@@ -223,3 +136,56 @@ if not matrix.empty:
         f"**Highest risk segment:** {worst['age_band']} · {worst['tenure_tier']}\n\n"
         f"Loss Ratio: **{worst_lr:.2f}** — {worst_desc}."
     )
+
+# ── Monthly Premium Collection ────────────────────────────────
+st.divider()
+st.subheader("📅 Monthly Premium Collection")
+st.caption(
+    "Total annual premiums from policies whose **issue month** falls in each calendar month. "
+    "Shows which months historically generate the most new premium revenue — "
+    "useful for cash flow planning and understanding when sales activity peaks."
+)
+
+pol["issue_month"] = pd.to_datetime(pol["issue_date"]).dt.month
+monthly_prem = (
+    pol.groupby("issue_month")["annual_premium"]
+    .sum().reset_index().rename(columns={"annual_premium":"total_premium"})
+)
+# Fill any missing months with 0
+all_months = pd.DataFrame({"issue_month": range(1, 13)})
+monthly_prem = all_months.merge(monthly_prem, on="issue_month", how="left").fillna(0)
+
+month_labels = ["Jan","Feb","Mar","Apr","May","Jun",
+                "Jul","Aug","Sep","Oct","Nov","Dec"]
+monthly_prem["month_name"] = monthly_prem["issue_month"].apply(lambda m: month_labels[m-1])
+
+avg_monthly = monthly_prem["total_premium"].mean()
+monthly_prem["color"] = monthly_prem["total_premium"].apply(
+    lambda v: NAVY if v >= avg_monthly else SKY
+)
+
+fig_monthly = go.Figure(go.Bar(
+    x=monthly_prem["month_name"],
+    y=monthly_prem["total_premium"],
+    marker_color=monthly_prem["color"].tolist(),
+    text=[f"${v:,.0f}" for v in monthly_prem["total_premium"]],
+    textposition="outside",
+))
+fig_monthly.add_hline(
+    y=avg_monthly, line_dash="dash", line_color=AMBER, line_width=1.5,
+    annotation_text=f"Monthly avg ${avg_monthly:,.0f}",
+    annotation_font_color=AMBER,
+)
+fig_monthly.update_layout(
+    height=340,
+    yaxis=dict(title="Annual Premiums ($)", gridcolor=GRID, tickformat="$,.0f"),
+    xaxis=dict(showgrid=False, title="Issue Month"),
+    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+    showlegend=False,
+)
+st.plotly_chart(fig_monthly, width="stretch")
+st.caption(
+    f"🟦 Dark navy bars = above average month (≥ ${avg_monthly:,.0f}). "
+    f"🔵 Sky blue bars = below average. "
+    "Amber dashed line = monthly average."
+)

@@ -11,7 +11,7 @@ import streamlit as st
 
 from data.sidebar_note import show as _sidebar_note
 from data.load_data import load_claims_fact
-from data.colors import AGING_COLORS, BLUE, SKY, NAVY, GRID, TEXT_MID, STATUS_COLORS, AMBER, RED, GREEN
+from data.colors import AGING_COLORS, BLUE, SKY, NAVY, GRID, TEXT_MID, STATUS_COLORS, AMBER, RED, GREEN, GRAY
 
 st.set_page_config(page_title="Claims Operations", page_icon="📋", layout="wide")
 st.title("📋 Claims Operations")
@@ -230,9 +230,9 @@ if not decided.empty:
         ))
 
     # Team average lines
-    fig_ex.add_hline(y=avg_approval, line_dash="dash", line_color=AMBER, line_width=1.5,
+    fig_ex.add_hline(y=avg_approval, line_dash="dash", line_color=GRAY, line_width=1.5,
                      annotation_text=f"Team avg approval {avg_approval:.0f}%",
-                     annotation_font_color=AMBER)
+                     annotation_font_color=GRAY)
     fig_ex.add_vline(x=avg_days, line_dash="dash", line_color=SKY, line_width=1.5,
                      annotation_text=f"Team avg {avg_days:.0f} days",
                      annotation_font_color=SKY)
