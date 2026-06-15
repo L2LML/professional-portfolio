@@ -20,6 +20,9 @@ env/
 # Pipeline output (generated files — not committed)
 insurance-cloud-migration/output/
 
+# Raw data files — too large for git
+fraud-detection-etl/data/*.csv
+
 # Jupyter
 .ipynb_checkpoints/
 

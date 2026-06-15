@@ -1,0 +1,9 @@
+
+	SELECT 
+    fraud_label,
+    COUNT(*) AS total,
+    ROUND(AVG(vehicle_price_clean), 0) AS avg_vehicle_price,
+    ROUND(AVG(age), 1) AS avg_age
+FROM fraud_claims
+GROUP BY fraud_label
+ORDER BY fraud_label;

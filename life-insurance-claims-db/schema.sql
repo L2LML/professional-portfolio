@@ -127,7 +127,7 @@ CREATE TABLE claims (
     claim_id          SERIAL PRIMARY KEY,
     claim_number      VARCHAR(20)  NOT NULL UNIQUE,
     policy_id         INT          NOT NULL REFERENCES policies(policy_id),
-    beneficiary_id    INT          NOT NULL REFERENCES beneficiaries(beneficiary_id),
+    beneficiary_id    INT          REFERENCES beneficiaries(beneficiary_id),
     date_of_death     DATE         NOT NULL,
     date_filed        DATE         NOT NULL,
     cause_of_death    VARCHAR(100),

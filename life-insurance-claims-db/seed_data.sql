@@ -32,7 +32,7 @@ INSERT INTO policyholders (first_name, last_name, date_of_birth, ssn_last4, emai
 ('Carol',    'Hutchinson', '1970-07-22', '6619', 'c.hutch@email.com',     '248-555-1004', '23 Orchard Hill Rd', 'Bloomfield',    'MI', '48302', 'Female', FALSE),
 ('Walter',   'Simmons',    '1958-11-05', '3345', 'w.simmons@email.com',   '614-555-1005', '890 Riverside Dr',   'Columbus',      'OH', '43215', 'Male',   FALSE),
 ('Barbara',  'Nguyen',     '1975-03-17', '7712', 'b.nguyen@email.com',    '614-555-1006', '34 Elm Street',      'Cleveland',     'OH', '44101', 'Female', FALSE),
-('Thomas',   'O\'Brien',   '1944-12-01', '9981', 't.obrien@email.com',    '317-555-1007', '612 Sunset Ave',     'Indianapolis',  'IN', '46201', 'Male',   TRUE),
+('Thomas',   'O''Brien',   '1944-12-01', '9981', 't.obrien@email.com',    '317-555-1007', '612 Sunset Ave',     'Indianapolis',  'IN', '46201', 'Male',   TRUE),
 ('Patricia', 'Washington', '1980-06-08', '5523', 'p.wash@email.com',      '248-555-1008', '100 Cherry Creek Rd','Royal Oak',     'MI', '48067', 'Female', FALSE),
 ('George',   'Martinez',   '1955-08-25', '1198', 'g.martinez@email.com',  '734-555-1009', '77 Pinecrest Blvd',  'Ypsilanti',     'MI', '48197', 'Male',   FALSE),
 ('Ruth',     'Thompson',   '1939-01-14', '4467', 'r.thompson@email.com',  '313-555-1010', '350 Warren Ave',     'Dearborn',      'MI', '48124', 'Female', FALSE),
