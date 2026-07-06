@@ -22,6 +22,10 @@ insurance-cloud-migration/output/
 
 # Raw data files — too large for git
 fraud-detection-etl/data/*.csv
+fraud-detection-etl/dashboard/*.csv
+fraud-detection-etl/dashboard/*.hyper
+fraud-detection-etl/dashboard/*.twb
+fraud-detection-etl/dashboard/.~*.twbr
 
 # Jupyter
 .ipynb_checkpoints/

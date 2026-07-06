@@ -96,3 +96,7 @@ df.to_sql(
 )
 
 print(f"\nloaded {len(df)} rows intoPostgresSQL table: fraud_claims")
+
+# Tableau Public can't connect to Postgres directly, so export a flat file too
+df.to_csv("../dashboard/fraud_claims_clean.csv", index=False)
+print(f"exported cleaned data to dashboard/fraud_claims_clean.csv")
