@@ -30,6 +30,10 @@ Every project (and the blank template set) uses the same three-document structur
 
 The same three-document set, blank and instructional (`[bracketed]` placeholders, a yellow-highlighted example row in every workbook tab, and a legend on the Instructions tab) — reusable for any future project, construction or technology.
 
+## Companion dashboard
+
+[`../dtw-pm-dashboard`](../dtw-pm-dashboard) is an interactive Streamlit dashboard that operationalizes these same documents — a portfolio rollup, Gantt-style schedule view, budget variance charts, a risk heatmap, a stakeholder power/interest grid, and a lessons-learned page — so the numbers here are clickable, not just readable.
+
 ## Skills demonstrated
 
 Project chartering · scope & WBS definition · schedule and budget tracking with live spreadsheet formulas · RACI/stakeholder management · risk register design and scoring · change/issue control · vendor and contractor management · commissioning and cutover planning · end-user training and hypercare support design · executive status reporting · project closeout and lessons-learned capture.

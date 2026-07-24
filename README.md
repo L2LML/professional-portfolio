@@ -66,7 +66,23 @@ A self-directed **project management organization system** — a reusable PM tem
 | **Project 1** | Data Center & NOC Build-Out (Construction/Infrastructure) — $4.25M GMP, 14 months |
 | **Project 2** | Network & Airport Operations Systems Modernization (Technology) — $2.65M, 9 months |
 | **Documents per project** | Project Charter + Communication Plan + Training/Commissioning Plan · PM Tracking Workbook (schedule, budget, RACI, stakeholders, risk, issues/changes, vendors) · Status Report + Closeout Report |
-| **Skills** | Project Chartering · Scope & WBS · Schedule & Budget Tracking · RACI/Stakeholder Management · Risk Registers · Change Control · Vendor Management · Commissioning & Cutover Planning · End-User Training · Executive Status Reporting |
+| **Companion dashboard** | [`/dtw-pm-dashboard`](./dtw-pm-dashboard) — interactive Streamlit rollup: portfolio KPIs, Gantt schedule, budget variance, risk heatmap, stakeholder power/interest grid, lessons learned |
+| **Skills** | Project Chartering · Scope & WBS · Schedule & Budget Tracking · RACI/Stakeholder Management · Risk Registers · Change Control · Vendor Management · Commissioning & Cutover Planning · End-User Training · Executive Status Reporting · Dashboard Design |
+
+---
+
+### 📊 DTW IT Center PM Dashboard
+**Folder:** [`/dtw-pm-dashboard`](./dtw-pm-dashboard)
+
+Interactive, multi-page Streamlit dashboard that operationalizes the [DTW IT Center PM Toolkit](./dtw-it-center-pm-toolkit) above — the same schedule, budget, risk, stakeholder, and closeout data as a clickable rollup instead of a set of Word/Excel files.
+
+| | |
+|---|---|
+| **Type** | Solo Project — Business Intelligence / Data Visualization (companion to the PM Toolkit case study) |
+| **Stack** | Python · Streamlit · Plotly · pandas · pyarrow |
+| **Pages** | Portfolio Executive Summary · Schedule & Milestones (Gantt) · Budget & Cost Tracking · Risk & Issue Management (heatmap) · Stakeholders & Vendors (power/interest grid) · Lessons Learned & Closeout |
+| **Key visuals** | Combined portfolio KPIs · planned-vs-actual spend & schedule curves with status-report snapshot markers · risk heatmap (probability × impact) · stakeholder power/interest grid · vendor contract value by rating |
+| **Skills** | Dashboard Design · Data Visualization · PM Data Modeling · KPI Rollup Design · Streamlit · Plotly |
 
 ---
 
