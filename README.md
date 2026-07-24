@@ -19,6 +19,7 @@ A **4-week live client engagement** completed through Siena Heights University P
 | **Method** | Full DMAIC · Two-sample T-test · Minitab · C&E Matrix · FMEA · Lean Waste Analysis |
 | **Results** | Mean processing time reduced 25–31% across all 3 pilot labs |
 | **Impact** | **$894,600+** minimum annual revenue recovery · Sigma: 2.6 → 2.9 |
+| **Includes** | A closing Lessons Learned slide — what went well, key takeaways, and how they carry into future engagements |
 | **Skills** | Project Management · Lean Six Sigma · Statistical Analysis · Process Improvement · Change Management |
 
 ---
