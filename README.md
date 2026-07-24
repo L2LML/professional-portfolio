@@ -23,6 +23,53 @@ A **4-week live client engagement** completed through Siena Heights University P
 
 ---
 
+### 🩺 Healthcare Burnout DMAIC Case Study
+**File:** [`healthcare-burnout-dmaic.pptx`](./healthcare-burnout-dmaic/healthcare-burnout-dmaic.pptx)
+**Folder:** [`/healthcare-burnout-dmaic`](./healthcare-burnout-dmaic)
+
+An **applied, self-directed case study** (not a client engagement) proposing a DMAIC-based program to reduce burnout and close standard-of-care adherence gaps across medical students, hospital staff, and hospital administration. Grounded in direct-care field experience with medically complex, non-verbal individuals; prepared as candidate work for a Senior Project Manager, Office of Well-Being role.
+
+| | |
+|---|---|
+| **Type** | Self-directed case study — job-application portfolio piece |
+| **Method** | Full DMAIC · MBI/Mini-Z burnout survey design · root-cause (fishbone) analysis · literature review · pilot design |
+| **Core Thesis** | Inconsistent standard-work adherence is both a symptom and a cause of burnout; sustained behavior change requires advancement/reward tied to consistency, not just low-cost perks |
+| **Evidence Base** | Cross-references 3 academic sources (2 × 2025, 1 × 1985) — all converge on low Personal Accomplishment / lack of career advancement as the more consistent burnout driver |
+| **Initiatives** | Low-cost (checklist accountability, tied recognition, peer huddles) through high-cost (tiered care-ladder advancement, 4-day week + dedicated coverage, staffing ratio increases) |
+| **Skills** | Project Management · DMAIC · Root-Cause Analysis · Literature Synthesis · Change Management · Cost/ROI Modeling · Program Design |
+
+---
+
+### 🩺 Healthcare Burnout & Adherence KPI Dashboard
+**Folder:** [`/healthcare-burnout-kpi-dashboard`](./healthcare-burnout-kpi-dashboard)
+
+A companion Streamlit dashboard that **operationalizes the DMAIC case study's Measure phase** — a working KPI tool built on a synthetic quarterly burnout survey and shift-level adherence log, so the case study's proposed metrics aren't just slides.
+
+| | |
+|---|---|
+| **Type** | Solo Project — Business Intelligence / Data Visualization |
+| **Stack** | Python · Streamlit · Plotly · pandas · pyarrow |
+| **Pages** | Executive Summary · Root-Cause Drivers · Adherence & Rotation Cadence · Initiative Tracker |
+| **Key metrics** | Burnout score · adherence rate · accountability gap (adherence variance) · turnover · safety risk index · pilot before/after impact |
+| **Skills** | Dashboard Design · Data Visualization · Synthetic Data Modeling · KPI Definition · Streamlit · Plotly |
+
+---
+
+### ✈️ DTW IT Center PM Toolkit — Construction & Technology Project Governance
+**Folder:** [`/dtw-it-center-pm-toolkit`](./dtw-it-center-pm-toolkit)
+
+A self-directed **project management organization system** — a reusable PM template set plus two fully worked example projects — prepared as candidate work for an **Infrastructure / IT Project Manager** role. Both example projects are scoped around one fictional facility (a Metro Detroit Airport IT Center) so they read as a connected program: a construction project builds the data center, a technology project migrates systems into it.
+
+| | |
+|---|---|
+| **Type** | Self-directed case study — job-application portfolio piece |
+| **Project 1** | Data Center & NOC Build-Out (Construction/Infrastructure) — $4.25M GMP, 14 months |
+| **Project 2** | Network & Airport Operations Systems Modernization (Technology) — $2.65M, 9 months |
+| **Documents per project** | Project Charter + Communication Plan + Training/Commissioning Plan · PM Tracking Workbook (schedule, budget, RACI, stakeholders, risk, issues/changes, vendors) · Status Report + Closeout Report |
+| **Skills** | Project Chartering · Scope & WBS · Schedule & Budget Tracking · RACI/Stakeholder Management · Risk Registers · Change Control · Vendor Management · Commissioning & Cutover Planning · End-User Training · Executive Status Reporting |
+
+---
+
 ### 📊 Insurance Claims BI Dashboard
 **Folder:** [`/insurance-dashboard`](./insurance-dashboard)
 
