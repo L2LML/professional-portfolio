@@ -15,10 +15,10 @@ The airport's core network runs on end-of-life switches and a single-threaded fi
 
 ## Files
 
-1. [`01_Charter_Comms_Training_Cutover_Plan.docx`](./01_Charter_Comms_Training_Cutover_Plan.docx) — Charter, Communication Plan, and a Training & End-User Support / Cutover Plan (directly maps to "facilitate training and support for end-users of new systems" in a typical IT PM role scope).
-2. [`02_PM_Tracking_Workbook.xlsx`](./02_PM_Tracking_Workbook.xlsx) — 12-line WBS/schedule, budget tracker (8 cost categories, live formulas), RACI matrix, 7-stakeholder register, 6-item risk register, issue/change log, and 4-vendor contractor register.
+1. [`01_Charter_Comms_Training_Cutover_Plan.docx`](./01_Charter_Comms_Training_Cutover_Plan.docx) — Charter, Communication Plan, a Quality Management Plan (technical-standards compliance, QA activities, 5-checkpoint acceptance test plan), and a Training & End-User Support / Cutover Plan (directly maps to "facilitate training and support for end-users of new systems" in a typical IT PM role scope).
+2. [`02_PM_Tracking_Workbook.xlsx`](./02_PM_Tracking_Workbook.xlsx) — 12-line WBS/schedule, budget tracker (8 cost categories, live formulas), 5-item quality control checklist, RACI matrix, 7-stakeholder register, 6-item risk register, issue/change log, and 4-vendor contractor register.
 3. [`03_Status_and_Closeout_Report.docx`](./03_Status_and_Closeout_Report.docx) — a mid-migration status snapshot (Month 6, core cutover already complete with zero unplanned downtime) followed by the final closeout report (~1.5% under budget, one approved change request, hypercare exit metrics).
 
 ## PM disciplines shown
 
-Technology project chartering and technical-standards/change-control compliance · vendor and systems-integrator management · zero-downtime cutover planning across live operational systems · cross-functional coordination with external stakeholders (airline tenants) who are coordination-dependent, not command-dependent · cybersecurity/monitoring implementation oversight · end-user training design and hypercare support · executive status reporting and closeout.
+Technology project chartering and technical-standards/change-control compliance · quality management (acceptance testing, cybersecurity hardening verification) · vendor and systems-integrator management · zero-downtime cutover planning across live operational systems · cross-functional coordination with external stakeholders (airline tenants) who are coordination-dependent, not command-dependent · cybersecurity/monitoring implementation oversight · end-user training design and hypercare support · executive status reporting and closeout.

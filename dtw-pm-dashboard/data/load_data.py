@@ -53,6 +53,11 @@ def load_monthly_progress():
 
 
 @st.cache_data
+def load_quality():
+    return pd.read_parquet(SAMPLE_DIR / "quality.parquet")
+
+
+@st.cache_data
 def load_final_summary():
     return pd.read_parquet(SAMPLE_DIR / "final_summary.parquet")
 

@@ -43,6 +43,9 @@ A power/interest grid (Keep Satisfied / Manage Closely / Monitor / Keep Informed
 ### 📚 Lessons Learned & Closeout
 Final summary vs. baseline (schedule, budget, scope), plus each project's Closeout Report lessons learned — What Went Well, What Could Improve, Recommendations, and Outstanding Items / Transition.
 
+### ✅ Quality Management
+Quality Control checklist status (Pass / In Progress / Not Started) per project, with pass-rate KPIs and the full inspection/acceptance-test checkpoint detail — sourced from each project's Quality Management Plan and Quality_Checklist workbook tab.
+
 ---
 
 ## 🧮 How the Data Is Built

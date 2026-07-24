@@ -203,6 +203,35 @@ risks = pd.concat([
 ], ignore_index=True)
 risks.to_parquet(SAMPLE_DIR / "risks.parquet", index=False)
 
+# ───────────────────────── Quality Control Checklist ─────────────────────────
+construction_quality = [
+    ("Foundation / sitework inspection", "Structural", "Passes AHJ foundation inspection; geotechnical sign-off", "AHJ inspection", "Pass", "Month 5", "General Contractor"),
+    ("MEP rough-in inspection (electrical, mechanical, fire)", "MEP", "Passes AHJ rough-in inspection; matches approved design", "AHJ inspection", "In Progress", "Month 9", "GC / Subcontractors"),
+    ("Level 1-2 Commissioning (equipment startup, functional test)", "Commissioning", "Equipment operates to manufacturer spec under static and functional test", "Commissioning Agent witness test", "Not Started", "Month 12-13", "Commissioning Agent"),
+    ("Level 3-4 Commissioning (integrated systems, simulated load/failure)", "Commissioning", "Power/cooling failover performs to design under simulated utility failure and full IT load", "Commissioning Agent witness test", "Not Started", "Month 13", "Commissioning Agent"),
+    ("Final punch-list walkthrough", "Closeout", "No open life-safety items; all other items logged with an owner and due date", "Joint GC / IT Ops walkthrough", "Not Started", "Month 14", "PM"),
+]
+technology_quality = [
+    ("Fiber backbone install & test", "Network", "Backbone validated at full design capacity with redundant failover", "Systems Integrator test + Network Eng witness", "Pass", "Month 4", "Network Engineering Lead"),
+    ("Core network cutover", "Network", "All concourses live on new core with zero unplanned downtime", "Post-cutover monitoring review", "Pass", "Month 5", "Network Engineering Lead"),
+    ("Operations system migration (passenger/baggage/access-control)", "Systems Migration", "Full backup taken; system passes functional acceptance test before legacy decommission", "Systems Integrator acceptance test", "In Progress", "Month 6-7", "Systems Integrator"),
+    ("Cybersecurity hardening checklist", "Security", "Segmentation, MFA, and patch compliance verified against technical standards", "Cybersecurity Lead sign-off", "In Progress", "Month 8", "Cybersecurity Lead"),
+    ("Go-live / hypercare exit review", "Closeout", "Support ticket volume returns to steady-state within 30 days", "Help Desk metrics review", "Not Started", "Month 9", "PM"),
+]
+
+
+def quality_df(rows, project_id):
+    df = pd.DataFrame(rows, columns=["checkpoint", "category", "acceptance_criteria", "method", "status", "target", "owner"])
+    df.insert(0, "project_id", project_id)
+    return df
+
+
+quality = pd.concat([
+    quality_df(construction_quality, CONSTRUCTION),
+    quality_df(technology_quality, TECHNOLOGY),
+], ignore_index=True)
+quality.to_parquet(SAMPLE_DIR / "quality.parquet", index=False)
+
 # ───────────────────────── Issues & Changes ─────────────────────────
 construction_issues = [
     ("I1", "Issue", "Switchgear supplier confirmed 4-week lead-time extension", 8, "PM", "High", "Open"),

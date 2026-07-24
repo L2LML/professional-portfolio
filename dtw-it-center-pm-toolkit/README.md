@@ -22,8 +22,8 @@ Project 2 is written as the direct continuation of Project 1 — it migrates int
 
 Every project (and the blank template set) uses the same three-document structure:
 
-1. **`01_Charter_...docx`** — Project Charter (purpose, objectives, KPIs, scope, milestones, assumptions/constraints, budget summary, approvals) + Stakeholder Communication Management Plan + a training/commissioning/cutover plan tailored to the delivery type.
-2. **`02_PM_Tracking_Workbook.xlsx`** — the working tracker, with one tab each for: WBS/Schedule, Budget Tracker (live formulas), RACI Matrix, Stakeholder Register, Risk Register (auto-scored), Issue & Change Log, and Vendor/Contractor Register.
+1. **`01_Charter_...docx`** — Project Charter (purpose, objectives, KPIs, scope, milestones, assumptions/constraints, budget summary, approvals) + Stakeholder Communication Management Plan + a Quality Management Plan (standards, QA activities, QC/inspection & test checkpoints) + a training/commissioning/cutover plan tailored to the delivery type.
+2. **`02_PM_Tracking_Workbook.xlsx`** — the working tracker, with one tab each for: WBS/Schedule, Budget Tracker (live formulas), Quality Control Checklist, RACI Matrix, Stakeholder Register, Risk Register (auto-scored), Issue & Change Log, and Vendor/Contractor Register.
 3. **`03_Status_and_Closeout_Report.docx`** — a recurring status-report template (RAG status, budget/schedule snapshot, top risks, escalations) followed by a final closeout report (baseline-vs-actual, lessons learned, sign-off).
 
 ## [`/templates`](./templates)
@@ -36,4 +36,4 @@ The same three-document set, blank and instructional (`[bracketed]` placeholders
 
 ## Skills demonstrated
 
-Project chartering · scope & WBS definition · schedule and budget tracking with live spreadsheet formulas · RACI/stakeholder management · risk register design and scoring · change/issue control · vendor and contractor management · commissioning and cutover planning · end-user training and hypercare support design · executive status reporting · project closeout and lessons-learned capture.
+Project chartering · scope & WBS definition · schedule and budget tracking with live spreadsheet formulas · quality management (QA/QC planning and inspection & test checkpoints) · RACI/stakeholder management · risk register design and scoring · change/issue control · vendor and contractor management · commissioning and cutover planning · end-user training and hypercare support design · executive status reporting · project closeout and lessons-learned capture.
