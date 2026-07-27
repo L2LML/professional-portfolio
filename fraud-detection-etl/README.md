@@ -15,6 +15,10 @@ cd etl
 python3 extract_transform.py
 ```
 
+![ETL process flow](diagrams/etl-process-flow.png)
+
+*Process flow diagrammed in Lucidchart.*
+
 ## Key findings
 
 - Overall fraud rate: **6.0%** (923 of 15,420 claims)
