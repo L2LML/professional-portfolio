@@ -180,6 +180,20 @@ A command-line number guessing game built with comprehensive unit testing demons
 
 ---
 
+### 🗺️ Vendo-Matic 800 — Process Documentation
+**Folder:** [`/vending-machine-process-map`](./vending-machine-process-map)
+
+Two Lean process maps of a Java CLI vending machine capstone — one mapping the software's full decision flow (guard conditions, error paths, audit-log capture points), one mapping the ten-stage build sequence including a mid-build testability refactor. Demonstrates applying DMAIC-style process mapping to a codebase rather than a business process.
+
+| | |
+|---|---|
+| **Type** | Solo Project — Process Documentation / Technical Communication |
+| **Stack** | HTML/CSS (self-contained, no dependencies) |
+| **Maps** | Operational flow (customer paths + decisions + system records) · Build timeline (construction sequence + refactor rationale) |
+| **Skills** | Process Mapping · Decision/Guard-Condition Documentation · Value-Stream Data Capture · Technical Documentation Design |
+
+---
+
 ### 🏠 Tax Assessor Document Skill
 **Folder:** [`/tax-assessor-docs`](./tax-assessor-docs)
 

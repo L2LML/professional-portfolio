@@ -1,0 +1,398 @@
+<title>Vendo-Matic 800 — Build Timeline</title>
+<style>
+  :root {
+    --bg: #eef0f1;
+    --surface: #ffffff;
+    --surface-2: #f7f8f9;
+    --text: #1b2024;
+    --text-muted: #5b6570;
+    --text-faint: #8a929a;
+    --border: #d3d8db;
+    --border-strong: #b7bfc3;
+    --accent: #9c7a2e;
+    --accent-ink: #1b2024;
+    --success: #3c7a54;
+    --success-bg: #eaf3ee;
+    --success-border: #bcdac9;
+    --danger: #a23b3b;
+    --shadow: 0 1px 2px rgba(20, 24, 27, 0.04), 0 6px 16px rgba(20, 24, 27, 0.06);
+
+    --font-display: "Avenir Next Condensed", "Bahnschrift", "Arial Narrow", "Helvetica Neue", sans-serif;
+    --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a;
+      --surface: #1d2226;
+      --surface-2: #20262b;
+      --text: #e8eaec;
+      --text-muted: #9aa3ac;
+      --text-faint: #6d757d;
+      --border: #2e3438;
+      --border-strong: #3c4348;
+      --accent: #d4af5a;
+      --accent-ink: #14171a;
+      --success: #6cbb8b;
+      --success-bg: #17251d;
+      --success-border: #2b4536;
+      --danger: #dd8383;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #14171a; --surface: #1d2226; --surface-2: #20262b; --text: #e8eaec;
+    --text-muted: #9aa3ac; --text-faint: #6d757d; --border: #2e3438; --border-strong: #3c4348;
+    --accent: #d4af5a; --accent-ink: #14171a; --success: #6cbb8b; --success-bg: #17251d;
+    --success-border: #2b4536; --danger: #dd8383;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #eef0f1; --surface: #ffffff; --surface-2: #f7f8f9; --text: #1b2024;
+    --text-muted: #5b6570; --text-faint: #8a929a; --border: #d3d8db; --border-strong: #b7bfc3;
+    --accent: #9c7a2e; --accent-ink: #1b2024; --success: #3c7a54; --success-bg: #eaf3ee;
+    --success-border: #bcdac9; --danger: #a23b3b;
+    --shadow: 0 1px 2px rgba(20, 24, 27, 0.04), 0 6px 16px rgba(20, 24, 27, 0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  .eyebrow::before { content: ""; width: 14px; height: 2px; background: var(--accent); }
+
+  h1 {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(34px, 5vw, 52px); letter-spacing: -0.01em;
+    margin: 10px 0 6px; text-wrap: balance;
+  }
+
+  .subtitle {
+    font-size: 16px; line-height: 1.55; color: var(--text-muted);
+    max-width: 62ch; margin: 0 0 4px;
+  }
+
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 8px 18px;
+    margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-faint);
+  }
+  .meta-row strong { color: var(--text-muted); font-weight: 600; }
+
+  .timeline { margin-top: 48px; position: relative; }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 19px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    column-gap: 20px;
+    padding-bottom: 34px;
+  }
+
+  .stage:last-of-type { padding-bottom: 0; }
+
+  .stage-badge {
+    position: relative;
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 15px;
+    box-shadow: var(--shadow);
+    flex: none;
+  }
+
+  .stage-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .stage-title {
+    font-weight: 700;
+    font-size: 15.5px;
+    margin: 0 0 6px;
+  }
+
+  .stage-desc {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0 0 12px;
+  }
+
+  .stage-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .file-chip {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 8px;
+  }
+
+  .stage-concept {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+    font-size: 12px;
+    color: var(--text-faint);
+    display: flex;
+    gap: 8px;
+  }
+
+  .stage-concept .k {
+    color: var(--accent);
+    font-weight: 700;
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding-top: 1px;
+  }
+
+  /* Refactor callout — off the numbered sequence */
+
+  .refactor {
+    position: relative;
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    column-gap: 20px;
+    padding-bottom: 34px;
+  }
+
+  .refactor-badge {
+    position: relative;
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px dashed var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex: none;
+    color: var(--text-faint);
+  }
+
+  .refactor-card {
+    background: transparent;
+    border: 1.5px dashed var(--border-strong);
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+
+  .refactor-card .rtitle {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 6px;
+  }
+
+  .refactor-card p {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .refactor-card strong { color: var(--text); }
+
+  .footer {
+    margin-top: 56px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+  }
+
+  @media (max-width: 560px) {
+    .stage, .refactor { grid-template-columns: 32px 1fr; column-gap: 14px; }
+    .stage-badge, .refactor-badge { width: 32px; height: 32px; font-size: 13px; }
+    .timeline::before { left: 15px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Build Timeline</span>
+    <h1>Building Vendo-Matic 800</h1>
+    <p class="subtitle">The sequence a Module 1 Java capstone actually got built in — ten stages, working outward from data model to tested, documented software, with one mid-build refactor along the way.</p>
+    <div class="meta-row">
+      <span><strong>Stack</strong> Java 17, Maven, JUnit 4</span>
+      <span><strong>Classes built</strong> 9</span>
+      <span><strong>Tests written</strong> 3 classes, 11 cases</span>
+    </div>
+  </header>
+
+  <div class="timeline">
+
+    <div class="stage">
+      <div class="stage-badge">1</div>
+      <div class="stage-card">
+        <p class="stage-title">Load the inventory</p>
+        <p class="stage-desc">Parse the pipe-delimited data file into a list of products, always restocking every slot to full capacity — the spec requires a fresh, full machine on every run, regardless of what quantity is recorded in the file.</p>
+        <div class="stage-files"><span class="file-chip">Product.java</span><span class="file-chip">InventoryLoader.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Classes vs. objects, constructors, BigDecimal for currency, try-with-resources</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">2</div>
+      <div class="stage-card">
+        <p class="stage-title">Show what's in stock</p>
+        <p class="stage-desc">Loop over every product and print its slot, name, and price — or SOLD OUT once a slot is empty.</p>
+        <div class="stage-files"><span class="file-chip">UserOutput.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> For-each loops, if/else branching</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">3</div>
+      <div class="stage-card">
+        <p class="stage-title">Wire it into the running machine</p>
+        <p class="stage-desc">Give VendingMachine its own inventory field, load it once in the constructor, and connect the home menu's "Display" option to real output for the first time.</p>
+        <div class="stage-files"><span class="file-chip">VendingMachine.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Fields vs. local variables, exception handling</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">4</div>
+      <div class="stage-card">
+        <p class="stage-title">Build the purchase submenu</p>
+        <p class="stage-desc">A second menu loop — Feed Money, Select Product, Finish Transaction — showing the running balance, with placeholder branches ready to fill in.</p>
+        <div class="stage-files"><span class="file-chip">UserInput.java</span><span class="file-chip">UserOutput.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Nested loops, boolean flags controlling loop exit</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">5</div>
+      <div class="stage-card">
+        <p class="stage-title">Accept money</p>
+        <p class="stage-desc">Validate that fed amounts are whole $1, $2, $5, or $10 bills, and add valid amounts onto the balance.</p>
+        <div class="stage-files"><span class="file-chip">VendingMachine.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Immutable BigDecimal — .add() returns a new value rather than mutating in place</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">6</div>
+      <div class="stage-card">
+        <p class="stage-title">Sell a product</p>
+        <p class="stage-desc">Look a slot code up in inventory, and walk through every failure mode in order — invalid code, sold out, insufficient funds — before dispensing and printing the flavor message.</p>
+        <div class="stage-files"><span class="file-chip">VendingMachine.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Helper methods, .equals() vs. == for object comparison, BigDecimal.compareTo()</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">7</div>
+      <div class="stage-card">
+        <p class="stage-title">Make change</p>
+        <p class="stage-desc">Greedy coin algorithm — as many quarters as fit, then dimes, then nickels — returning the fewest coins possible, then resetting the balance to zero.</p>
+        <div class="stage-files"><span class="file-chip">VendingMachine.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Integer division vs. modulo, arrays for returning multiple values</div>
+      </div>
+    </div>
+
+    <div class="refactor">
+      <div class="refactor-badge">↻</div>
+      <div class="refactor-card">
+        <p class="rtitle">Refactor, ahead of testing</p>
+        <p>Coin math started out as a <strong>private</strong> method buried inside VendingMachine — fine to run, impossible to unit test directly. Pulled it out into its own <strong>ChangeCalculator</strong> class with a public method, matching the capstone's own guidance to keep classes testable and console I/O contained. Same logic, now independently verifiable.</p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">8</div>
+      <div class="stage-card">
+        <p class="stage-title">Audit every transaction</p>
+        <p class="stage-desc">Timestamped Log.txt entries for every money-fed, purchase, and change-given event, in the exact format the spec requires.</p>
+        <div class="stage-files"><span class="file-chip">AuditLogger.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Append-mode file writing, DateTimeFormatter, fixed-scale currency formatting</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">9</div>
+      <div class="stage-card">
+        <p class="stage-title">Generate the sales report</p>
+        <p class="stage-desc">A hidden "4" option on the home menu compiles units sold per product — starting stock minus what's left — plus gross sales, into a uniquely timestamped file.</p>
+        <div class="stage-files"><span class="file-chip">Product.java</span><span class="file-chip">SalesReportWriter.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Deriving state from existing data instead of a separate counter</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-badge">10</div>
+      <div class="stage-card">
+        <p class="stage-title">Prove it with tests</p>
+        <p class="stage-desc">JUnit coverage for the three most self-contained pieces of logic: coin-making math, sold-count and stock-guard behavior, and CSV parsing.</p>
+        <div class="stage-files"><span class="file-chip">ChangeCalculatorTest.java</span><span class="file-chip">ProductTest.java</span><span class="file-chip">InventoryLoaderTest.java</span></div>
+        <div class="stage-concept"><span class="k">Concepts</span> Arrange/Act/Assert, assertArrayEquals vs. assertEquals, testing guard clauses directly</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span>Vendo-Matic 800 — Module 1 Java Capstone, Tech Elevator</span>
+    <span>Companion to the operational process map</span>
+  </div>
+
+</div>
