@@ -24,6 +24,23 @@ A **4-week live client engagement** completed through Siena Heights University P
 
 ---
 
+### 🧩 Closing the Data Gap — Behavioral Incident Tracking DMAIC Case Study
+**Folder:** [`/wisd-behavioral-data-dmaic`](./wisd-behavioral-data-dmaic)
+
+A **real DMAIC case study** from direct-care work at Washtenaw ISD (Special Education) — a 3-person paraprofessional team's behavioral (ABC) data collection process, mapped before and after a root-cause-driven redesign. Unlike the healthcare burnout case study below, this is not a hypothetical proposal: it's an actual before-and-after with real numbers, plus a natural comparison case (a parallel effort that didn't sustain) that validates the root-cause finding.
+
+| | |
+|---|---|
+| **Type** | Real workplace case study — job-application portfolio piece |
+| **Method** | Full DMAIC · root-cause analysis · 5S-style tool/workplace design · cross-functional swimlane process mapping |
+| **Core Thesis** | Access and training raise process compliance temporarily, but only a visible feedback loop — someone using the data, and staff seeing that it mattered — sustains it |
+| **Results** | Team data-collection compliance 33% → ~80% over ~2 months · 20% reduction in behavioral outbursts from a data-driven schedule change |
+| **Comparison Case** | An identical fix applied to IEP goal tracking hit 80% in month one but collapsed to under 10% within two months once no one reviewed the data — confirming the feedback-loop finding |
+| **Format** | Cross-functional swimlane flowchart (standard oval/rectangle/diamond/parallelogram notation) with one lane per role, marking every step personally introduced by Lisa vs. steps performed by the full team |
+| **Skills** | DMAIC · Root-Cause Analysis · Process Mapping · Swim Lane Diagramming · 5S · Stakeholder Facilitation · Data-Driven Decision Making |
+
+---
+
 ### 🩺 Healthcare Burnout DMAIC Case Study
 **File:** [`healthcare-burnout-dmaic.pptx`](./healthcare-burnout-dmaic/healthcare-burnout-dmaic.pptx)
 **Folder:** [`/healthcare-burnout-dmaic`](./healthcare-burnout-dmaic)

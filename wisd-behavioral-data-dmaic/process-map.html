@@ -1,0 +1,370 @@
+<meta charset="UTF-8">
+<title>Behavioral Data Collection — Swimlane Process Map (Before / After)</title>
+<style>
+  :root {
+    --bg: #eef0f1;
+    --surface: #ffffff;
+    --surface-2: #f7f8f9;
+    --lane-a: #f7f4ea;
+    --lane-b: #eef2f4;
+    --lane-c: #f2eef4;
+    --text: #1b2024;
+    --text-muted: #5b6570;
+    --text-faint: #8a929a;
+    --border: #d3d8db;
+    --border-strong: #b7bfc3;
+    --accent: #9c7a2e;
+    --accent-ink: #1b2024;
+    --success: #3c7a54;
+    --success-bg: #eaf3ee;
+    --success-border: #bcdac9;
+    --danger: #a23b3b;
+    --danger-bg: #f8ecec;
+    --danger-border: #e3bcbc;
+    --shadow: 0 1px 2px rgba(20, 24, 27, 0.05), 0 4px 10px rgba(20, 24, 27, 0.06);
+    --font-display: "Avenir Next Condensed", "Bahnschrift", "Arial Narrow", "Helvetica Neue", sans-serif;
+    --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a; --surface: #1d2226; --surface-2: #20262b;
+      --lane-a: #241f14; --lane-b: #17222a; --lane-c: #201924;
+      --text: #e8eaec; --text-muted: #9aa3ac; --text-faint: #6d757d;
+      --border: #2e3438; --border-strong: #3c4348;
+      --accent: #d4af5a; --accent-ink: #14171a;
+      --success: #6cbb8b; --success-bg: #17251d; --success-border: #2b4536;
+      --danger: #dd8383; --danger-bg: #291a1a; --danger-border: #4a2a2a;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 6px 16px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171a; --surface: #1d2226; --surface-2: #20262b;
+    --lane-a: #241f14; --lane-b: #17222a; --lane-c: #201924;
+    --text: #e8eaec; --text-muted: #9aa3ac; --text-faint: #6d757d;
+    --border: #2e3438; --border-strong: #3c4348;
+    --accent: #d4af5a; --accent-ink: #14171a;
+    --success: #6cbb8b; --success-bg: #17251d; --success-border: #2b4536;
+    --danger: #dd8383; --danger-bg: #291a1a; --danger-border: #4a2a2a;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 6px 16px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #eef0f1; --surface: #ffffff; --surface-2: #f7f8f9;
+    --lane-a: #f7f4ea; --lane-b: #eef2f4; --lane-c: #f2eef4;
+    --text: #1b2024; --text-muted: #5b6570; --text-faint: #8a929a;
+    --border: #d3d8db; --border-strong: #b7bfc3;
+    --accent: #9c7a2e; --accent-ink: #1b2024;
+    --success: #3c7a54; --success-bg: #eaf3ee; --success-border: #bcdac9;
+    --danger: #a23b3b; --danger-bg: #f8ecec; --danger-border: #e3bcbc;
+    --shadow: 0 1px 2px rgba(20,24,27,.05), 0 4px 10px rgba(20,24,27,.06);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .eyebrow::before { content: ""; width: 14px; height: 2px; background: var(--accent); }
+  h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4.6vw, 46px); letter-spacing: -0.01em; margin: 10px 0 6px; text-wrap: balance; }
+  .subtitle { font-size: 15.5px; line-height: 1.55; color: var(--text-muted); max-width: 72ch; margin: 0; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+  .meta-row strong { color: var(--text-muted); font-weight: 600; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 22px 24px; margin-top: 28px; }
+  .panel h2 { font-family: var(--font-display); font-size: 13px; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 0 0 16px; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-muted); }
+  .sw { flex: none; }
+  .sw.terminal { width: 32px; height: 16px; border-radius: 999px; background: var(--accent); }
+  .sw.process { width: 30px; height: 18px; border-radius: 3px; background: var(--surface); border: 1.5px solid var(--border-strong); }
+  .sw.decision { width: 20px; height: 20px; background: var(--surface); border: 1.5px solid var(--border-strong); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+  .sw.data { width: 32px; height: 16px; background: var(--surface); border: 1.5px solid var(--border-strong); clip-path: polygon(12% 0, 100% 0, 88% 100%, 0 100%); }
+  .sw.mine { width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .metric .label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); }
+  .metric .value { font-family: var(--font-display); font-weight: 700; font-size: 26px; margin-top: 4px; color: var(--success); }
+  .metric .value .arrow { color: var(--text-faint); font-weight: 400; font-size: 18px; margin: 0 6px; }
+  .metric .note { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
+
+  /* ---- swimlane diagram ---- */
+  .diagram-title { display: flex; align-items: center; gap: 10px; margin: 44px 0 14px; }
+  .diagram-title .tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; }
+  .diagram-title .tag.before { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+  .diagram-title .tag.after { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+  .diagram-title h2 { font-family: var(--font-display); font-size: 20px; margin: 0; }
+
+  .swimlanes { border: 1px solid var(--border-strong); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+  .lane-headers { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .lane-header { padding: 12px 16px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border-strong); border-right: 1px solid var(--border); }
+  .lane-header:last-child { border-right: none; }
+  .lane-header .sub { display: block; font-family: var(--font-body); font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--text-muted); font-size: 11.5px; margin-top: 2px; }
+  .lane-header.lisa { background: var(--lane-a); color: var(--accent); }
+  .lane-header.team { background: var(--lane-b); }
+  .lane-header.clinician { background: var(--lane-c); }
+
+  .lane-body { display: grid; grid-template-columns: repeat(3, 1fr); position: relative; }
+  .lane-col { border-right: 1px solid var(--border); padding: 22px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .lane-col:last-child { border-right: none; }
+  .lane-col.lisa { background: color-mix(in srgb, var(--lane-a) 55%, var(--surface)); }
+  .lane-col.team { background: color-mix(in srgb, var(--lane-b) 45%, var(--surface)); }
+  .lane-col.clinician { background: color-mix(in srgb, var(--lane-c) 45%, var(--surface)); }
+
+  .row-gap { height: 8px; }
+  .arrow-down { width: 2px; height: 20px; background: var(--border-strong); position: relative; }
+  .arrow-down::after { content: ""; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--border-strong); }
+
+  .handoff { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; padding: 2px 4px; }
+  .handoff .line { flex: 1; height: 1.5px; background: repeating-linear-gradient(90deg, var(--border-strong) 0 6px, transparent 6px 11px); position: relative; }
+  .handoff .line::after { content: ""; position: absolute; right: -2px; top: 50%; transform: translateY(-50%); border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid var(--border-strong); }
+  .handoff .label { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-faint); white-space: nowrap; }
+
+  /* shapes */
+  .shape { font-size: 13px; box-shadow: var(--shadow); position: relative; width: 100%; max-width: 260px; }
+  .shape .t { font-weight: 700; font-size: 13px; line-height: 1.3; }
+  .shape .d { font-size: 11.5px; color: var(--text-muted); line-height: 1.45; margin-top: 3px; }
+
+  .shape.terminal { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 10px 20px; text-align: center; font-family: var(--font-display); font-weight: 700; }
+  .shape.terminal .t { font-size: 13.5px; }
+
+  .shape.process { background: var(--surface); border: 1.5px solid var(--border-strong); border-radius: 4px; padding: 12px 14px; }
+  .shape.process.danger { background: var(--danger-bg); border-color: var(--danger-border); }
+  .shape.process.danger .t { color: var(--danger); }
+  .shape.process.success { background: var(--success-bg); border-color: var(--success-border); }
+  .shape.process.success .t { color: var(--success); }
+
+  .shape.decision { background: var(--surface); border: 2.5px solid var(--text-faint); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); padding: 34px 20px; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 140px; }
+  .shape.decision .t { font-size: 12px; }
+
+  .shape.data { background: var(--surface); border: 1.5px solid var(--border-strong); clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%); padding: 12px 22px; }
+
+  .shape.mine { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
+  .shape.mine::before {
+    content: "★"; position: absolute; top: -10px; right: -10px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: var(--accent-ink); font-size: 11px; display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow);
+  }
+
+  .decision-branches { display: flex; gap: 14px; width: 100%; justify-content: center; flex-wrap: wrap; }
+  .branch { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; min-width: 110px; }
+  .branch-tag { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; }
+  .branch-tag.no { color: var(--danger); }
+  .branch-tag.yes { color: var(--success); }
+
+  .lane-note { margin-top: auto; padding-top: 8px; }
+
+  .loop-back { display: inline-flex; align-items: center; gap: 6px; border: 1.5px dashed var(--danger-border); color: var(--danger); border-radius: 999px; padding: 6px 14px; font-family: var(--font-mono); font-size: 11px; }
+
+  .root-cause-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .rc { background: var(--danger-bg); border: 1px solid var(--danger-border); border-radius: 8px; padding: 14px 16px; }
+  .rc .t { font-weight: 700; font-size: 13px; color: var(--danger); margin: 0 0 4px; }
+  .rc .d { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+
+  .lessons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .lessons-col { padding: 16px 18px; border-radius: 8px; }
+  .lessons-col.win { background: var(--success-bg); border: 1px solid var(--success-border); }
+  .lessons-col.contrast { background: var(--danger-bg); border: 1px solid var(--danger-border); }
+  .lessons-col h3 { font-family: var(--font-display); font-size: 13px; margin: 0 0 10px; }
+  .lessons-col.win h3 { color: var(--success); }
+  .lessons-col.contrast h3 { color: var(--danger); }
+  .lessons-col ul { font-size: 13px; line-height: 1.55; color: var(--text-muted); margin: 0; padding-left: 18px; }
+  .takeaway { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 13.5px; line-height: 1.6; }
+  .takeaway strong { color: var(--accent); }
+
+  .contribution-note { display: flex; gap: 12px; align-items: flex-start; background: var(--lane-a); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-top: 28px; }
+  .contribution-note .star { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+  .contribution-note p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--text-muted); }
+  .contribution-note strong { color: var(--text); }
+
+  .footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text-faint); font-family: var(--font-mono); }
+
+  @media (max-width: 860px) {
+    .lane-headers, .lane-body { grid-template-columns: 1fr; }
+    .lane-col, .lane-header { border-right: none; border-bottom: 1px solid var(--border); }
+    .root-cause-grid, .lessons-grid { grid-template-columns: 1fr; }
+    .handoff { flex-direction: row; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Swimlane Process Map · DMAIC Case Study</span>
+    <h1>Closing the Data Gap in Behavioral Incident Tracking</h1>
+    <p class="subtitle">Cross-functional flowchart of a 3-person paraprofessional team's ABC (Antecedent-Behavior-Consequence) data collection process, before and after a redesign — Washtenaw ISD, Special Education. One lane per role, so it's clear who did what.</p>
+    <div class="meta-row">
+      <span><strong>Scope</strong> Incident occurs → data reviewed → schedule/support decision made</span>
+      <span><strong>Method</strong> DMAIC</span>
+      <span><strong>Notation</strong> Standard flowchart: oval = start/end, rectangle = process, diamond = decision, parallelogram = data</span>
+    </div>
+  </header>
+
+  <section class="panel">
+    <h2>Legend</h2>
+    <div class="legend">
+      <div class="legend-item"><span class="sw terminal"></span> Start / End</div>
+      <div class="legend-item"><span class="sw process"></span> Process step</div>
+      <div class="legend-item"><span class="sw decision"></span> Decision</div>
+      <div class="legend-item"><span class="sw data"></span> Data recorded / reviewed</div>
+      <div class="legend-item"><span class="sw mine">★</span> Introduced or led personally by Lisa</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Results — Before / After</h2>
+    <div class="metric-grid">
+      <div class="metric"><div class="label">Team Data-Collection Compliance</div><div class="value">33%<span class="arrow">→</span>80%</div><div class="note">1 of 3 staff recording regularly, rising to ~80% of expected entries, over ~2 months</div></div>
+      <div class="metric"><div class="label">Behavioral Outbursts</div><div class="value">−20%</div><div class="note">Following a schedule change identified from the pattern in the data</div></div>
+      <div class="metric"><div class="label">Timeframe</div><div class="value">~8 wks</div><div class="note">From the BCBA's original request to sustained team compliance</div></div>
+    </div>
+  </section>
+
+  <!-- ============ AS-IS ============ -->
+  <div class="diagram-title"><span class="tag before">Before</span><h2>As-Is Process — Define / Measure</h2></div>
+
+  <div class="swimlanes">
+    <div class="lane-headers">
+      <div class="lane-header lisa">Lisa <span class="sub">Paraprofessional</span></div>
+      <div class="lane-header team">Other 2 Paraprofessionals</div>
+      <div class="lane-header clinician">BCBA / Lead Teacher</div>
+    </div>
+    <div class="lane-body">
+
+      <div class="lane-col lisa">
+        <div class="shape process"><div class="t">Incident occurs, on shift</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process"><div class="t">Improvises access</div><div class="d">Writes on lap or nearby surface despite no dedicated setup.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape data"><div class="t">Entry recorded</div><div class="d">Date, time, antecedent, behavior, notes.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process"><div class="t">Sheet placed — no defined location</div></div>
+      </div>
+
+      <div class="lane-col team">
+        <div class="shape process"><div class="t">Incident occurs, on shift</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape decision"><div class="t">Sheet accessible right now?</div></div>
+        <div class="decision-branches">
+          <div class="branch"><span class="branch-tag no">no</span><div class="shape process danger"><div class="t">Entry skipped</div></div></div>
+          <div class="branch"><span class="branch-tag yes">yes</span><div class="shape decision" style="min-height:110px; padding:22px 14px;"><div class="t">Knows ABC method?</div></div></div>
+        </div>
+        <div class="decision-branches">
+          <div class="branch"><span class="branch-tag no">no</span><div class="shape process danger"><div class="t">Entry skipped / incomplete</div></div></div>
+          <div class="branch"><span class="branch-tag yes">rarely</span><div class="shape process"><div class="t">Entry recorded</div></div></div>
+        </div>
+      </div>
+
+      <div class="lane-col clinician">
+        <div class="shape terminal"><div class="t">Awaiting data</div></div>
+        <div class="row-gap" style="height:64px;"></div>
+        <div class="shape data"><div class="t">Reviews whatever arrives</div><div class="d">Mostly Lisa's entries — inconsistent, incomplete picture.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process danger"><div class="t">"Data is irregular &amp; insufficient"</div></div>
+        <div class="lane-note"><span class="loop-back">↺ No feedback shared back to staff</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <section class="panel" style="margin-top:24px;">
+    <h2>Root Cause Analysis</h2>
+    <div class="root-cause-grid">
+      <div class="rc"><p class="t">Tool / access friction</p><p class="d">No per-student storage, no consistent writing surface, no pens.</p></div>
+      <div class="rc"><p class="t">Knowledge gap</p><p class="d">One team member never formally trained on the ABC method.</p></div>
+      <div class="rc"><p class="t">No feedback loop</p><p class="d">Data collected had no visible use — so it had no visible value.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ TO-BE ============ -->
+  <div class="diagram-title"><span class="tag after">After</span><h2>To-Be Process — Improve / Control</h2></div>
+
+  <div class="swimlanes">
+    <div class="lane-headers">
+      <div class="lane-header lisa">Lisa <span class="sub">Process Owner</span></div>
+      <div class="lane-header team">Full Team (3, incl. Lisa)</div>
+      <div class="lane-header clinician">BCBA / Lead Teacher</div>
+    </div>
+    <div class="lane-body">
+
+      <div class="lane-col lisa">
+        <div class="shape terminal"><div class="t">Identifies root causes</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process mine"><div class="t">Introduces per-student clipboards</div><div class="d">Fixes access + writing-surface friction.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process mine"><div class="t">Attaches pens to clipboards</div><div class="d">Closes friction point that surfaced after fix #1.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process mine"><div class="t">Requests &amp; facilitates BCBA training meeting</div><div class="d">Brings both teammates and the BCBA together to align on standard.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process mine"><div class="t">Designs daily turn-in system</div><div class="d">Dated, collector recorded, single red-folder location.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process mine"><div class="t">Coaches memory-anchor technique</div><div class="d">Use class/subject to reconstruct unclear incident times.</div></div>
+      </div>
+
+      <div class="lane-col team">
+        <div class="row-gap" style="height:40px;"></div>
+        <div class="shape terminal"><div class="t">Incident occurs</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process success"><div class="t">Retrieves assigned clipboard</div><div class="d">Always accessible, pen attached.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape data"><div class="t">Records ABC entry</div><div class="d">Date, time (or class/subject anchor), antecedent, behavior, notes.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process success"><div class="t">Dates sheet, notes collector</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process success"><div class="t">Files in red folder</div><div class="d">Defined location, defined owner.</div></div>
+      </div>
+
+      <div class="lane-col clinician">
+        <div class="row-gap" style="height:220px;"></div>
+        <div class="shape data"><div class="t">Reviews red folder regularly</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape process success"><div class="t">Identifies behavior pattern</div><div class="d">e.g., a student regulates poorly on days without early movement.</div></div>
+        <div class="arrow-down"></div>
+        <div class="shape decision"><div class="t">Pattern actionable?</div></div>
+        <div class="decision-branches">
+          <div class="branch"><span class="branch-tag no">not yet</span><div class="shape process"><div class="t">Continue tracking</div></div></div>
+          <div class="branch"><span class="branch-tag yes">yes</span><div class="shape process success"><div class="t">Adjusts schedule</div><div class="d">Swimming moved to first period.</div></div></div>
+        </div>
+        <div class="arrow-down"></div>
+        <div class="shape terminal"><div class="t">Behavioral outbursts reduced 20%</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="contribution-note">
+    <span class="star">★</span>
+    <p><strong>Every starred step in the Lisa lane is a process change she personally introduced</strong> — not a step she merely performed. The steady-state process that follows (shared across the full team) exists because of those five interventions; the compliance and outcome numbers above are the measured result of them.</p>
+  </div>
+
+  <section class="panel">
+    <h2>Lessons Learned — A Natural Comparison</h2>
+    <div class="lessons-grid">
+      <div class="lessons-col win">
+        <h3>Behavioral data (this process)</h3>
+        <ul>
+          <li>Same fixes applied: accessible tools, training, dated turn-in to one location.</li>
+          <li>BCBA actively reviewed the folder and used it to change a student's schedule.</li>
+          <li>Compliance sustained near 80% for the full period tracked.</li>
+        </ul>
+      </div>
+      <div class="lessons-col contrast">
+        <h3>IEP goal data (parallel effort, same team)</h3>
+        <ul>
+          <li>Same fixes applied, reached 80% compliance in month one.</li>
+          <li>No one reviewed or acted on the data afterward.</li>
+          <li>Compliance fell to 30%, then under 10%, within two more months — including Lisa's own recording frequency.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="takeaway"><strong>Takeaway:</strong> access and training raise compliance temporarily, but only a visible feedback loop — someone using the data and staff seeing that it mattered — sustains it. That held true even for the person most invested in the process.</p>
+  </section>
+
+  <div class="footer">
+    <span>Washtenaw ISD — Paraprofessional / Special Education, May 2024–Present</span>
+    <span>Mapped for process-improvement portfolio documentation</span>
+  </div>
+
+</div>
