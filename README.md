@@ -1,4 +1,4 @@
-# Professional Portfolio — Lisa Lewandowski
+# Process Improvement Portfolio — Lisa Lewandowski
 
 A collection of professional case studies, software development projects, and applied work demonstrating skills in process improvement, full-stack development, data analysis, and project management.
 
