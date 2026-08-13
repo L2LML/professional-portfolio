@@ -31,7 +31,7 @@ A **real DMAIC case study** from direct-care work at Washtenaw ISD (Special Educ
 
 | | |
 |---|---|
-| **Type** | Real workplace case study — job-application portfolio piece |
+| **Type** | Real workplace case study — process improvement portfolio piece |
 | **Method** | Full DMAIC · root-cause analysis · 5S-style tool/workplace design · cross-functional swimlane process mapping |
 | **Core Thesis** | Access and training raise process compliance temporarily, but only a visible feedback loop — someone using the data, and staff seeing that it mattered — sustains it |
 | **Results** | Team data-collection compliance 33% → ~80% over ~2 months · 20% reduction in behavioral outbursts from a data-driven schedule change |
@@ -49,12 +49,30 @@ An **applied, self-directed case study** (not a client engagement) proposing a D
 
 | | |
 |---|---|
-| **Type** | Self-directed case study — job-application portfolio piece |
+| **Type** | Self-directed case study — process improvement portfolio piece |
 | **Method** | Full DMAIC · MBI/Mini-Z burnout survey design · root-cause (fishbone) analysis · literature review · pilot design |
 | **Core Thesis** | Inconsistent standard-work adherence is both a symptom and a cause of burnout; sustained behavior change requires advancement/reward tied to consistency, not just low-cost perks |
 | **Evidence Base** | Cross-references 3 academic sources (2 × 2025, 1 × 1985) — all converge on low Personal Accomplishment / lack of career advancement as the more consistent burnout driver |
 | **Initiatives** | Low-cost (checklist accountability, tied recognition, peer huddles) through high-cost (tiered care-ladder advancement, 4-day week + dedicated coverage, staffing ratio increases) |
 | **Skills** | Project Management · DMAIC · Root-Cause Analysis · Literature Synthesis · Change Management · Cost/ROI Modeling · Program Design |
+
+---
+
+### 📋 Amazon Marketplace SOP Framework & Validation Methodology
+**Folder:** [`/amazon-marketplace-sop-framework`](./amazon-marketplace-sop-framework)
+**Methodology:** [`7-Point_SOP_Validation_Framework.docx`](./amazon-marketplace-sop-framework/7-Point_SOP_Validation_Framework.docx)
+**Findings:** [`VALIDATION_LOG.md`](./amazon-marketplace-sop-framework/VALIDATION_LOG.md)
+
+A self-directed operations documentation project building a complete 13-SOP framework for an Amazon marketplace brand-management business, then independently stress-testing every SOP against a structured QA methodology rather than treating "written" as "done."
+
+| | |
+|---|---|
+| **Type** | Self-directed case study — Ecommerce Process Improvement portfolio piece |
+| **Scope** | 13 SOPs across Brand Protection, Customer Service, Inventory, Logistics, Compliance, Advertising, and more — split into trigger-based "Response" SOPs and calendar-based "Process" SOPs |
+| **Method** | Custom 7-point validation checklist run independently against every SOP: blind execution test, real-incident audit, orphaned-branch check, independent-execution consistency check, SLA timing check, escalation stress test, deviation-rate tracking |
+| **Findings** | Confirmed 4 recurring defect classes across unrelated SOPs — dual- and zero-Accountable RACI rows, escalation triggers with no resolution bound, roles named in escalation but missing from the RACI, and a cross-SOP dependency gap with real financial exposure |
+| **Notable catch** | Fixing one SOP to reference a second introduced a new contradiction with that SOP's existing wording — caught only because the methodology re-validates cross-references after every change, not just once |
+| **Skills** | Process Documentation · RACI Design · Quality Assurance / Validation Methodology · Root-Cause Analysis · Cross-Functional Dependency Mapping · Node.js (automated document generation) |
 
 ---
 
@@ -80,7 +98,7 @@ A self-directed **project management organization system** — a reusable PM tem
 
 | | |
 |---|---|
-| **Type** | Self-directed case study — job-application portfolio piece |
+| **Type** | Self-directed case study — process improvement portfolio piece |
 | **Project 1** | Data Center & NOC Build-Out (Construction/Infrastructure) — $4.25M GMP, 14 months |
 | **Project 2** | Network & Airport Operations Systems Modernization (Technology) — $2.65M, 9 months |
 | **Documents per project** | Project Charter + Communication Plan + Quality Management Plan + Training/Commissioning Plan · PM Tracking Workbook (schedule, budget, quality checklist, RACI, stakeholders, risk, issues/changes, vendors) · Status Report + Closeout Report |
